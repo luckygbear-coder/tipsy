@@ -1,10 +1,15 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>找微醺熊講心事</title>
-
+<!-- ✅ 最上方主題：改成 IG 連結按鈕 -->
+<a id="btnIGTop" class="top-ig-btn" href="https://instagram.com/luckygbear" target="_blank" rel="noopener">
+  <img class="top-ig-icon" src="images/tipsy-bear.png" alt="微醺熊" />
+  <div class="top-ig-text">
+    <div class="top-ig-title">找微醺熊聊心事 🐻🍷</div>
+    <div class="top-ig-sub">點我去 IG，跟熊熊聊聊</div>
+  </div>
+  <div class="top-ig-arrow">›</div>
+</a>
   <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#ffeec9" />
@@ -27,18 +32,20 @@
     </header>
 
     <main class="main">
-      <!-- 主視覺：熊 + 漫畫氣泡（不跳窗） -->
-      <section class="hero" id="heroTap" aria-label="點熊熊換一句">
-        <img id="bearHeroImg" alt="微醺熊主圖">
-        <div class="badge" id="countBadge">🍇 微醺酒窖｜已收錄 33 杯</div>
+ <!-- ✅ 熊主視覺卡片：圖片 + 氣泡（在熊頭上） -->
+<div class="hero-card" id="heroTap">
+  <div class="hero-media">
+    <img id="bearHeroImg" class="hero-img" src="images/tipsy-bear.png" alt="tipsy bear" />
 
-        <!-- ✅ 漫畫氣泡：點熊熊換一句 -->
-        <div class="comic-bubble" id="comicBubble" role="button" tabindex="0" title="點我換一句">
-          🐻「我在這裡，慢慢來。」
-        </div>
-        <div class="tapHint">👆 點熊熊或氣泡換一句</div>
-      </section>
+    <!-- ✅ 氣泡改到熊頭上（放在圖片上方） -->
+    <div id="comicBubble" class="comic-bubble over-bear" tabindex="0" role="button" aria-label="點一下換一句">
+      🐻「你來了就好，我在。」
+    </div>
 
+    <!-- ✅ 右下角提示（原本右上角那個） -->
+    <div class="hero-hint">☝️ 點熊熊或氣泡換一句</div>
+  </div>
+</div>
       <!-- ✅ 只留兩個主操作 -->
       <section class="row2">
         <button class="btn" id="btnRandom">🎲 隨機一杯</button>
@@ -67,13 +74,7 @@
       </section>
     </main>
 
-    <!-- ✅ 底欄只留 3 個：紀錄 / 收藏 / IG -->
-    <nav class="dock">
-      <div class="dock-inner">
-        <button class="btn small secondary" id="btnHistory">🕰️ 紀錄</button>
-        <button class="btn small secondary" id="btnFavList">⭐ 收藏</button>
-        <button class="btn small ig" id="btnIG">📷 找微醺熊說心事</button>
-      </div>
+
 
       <div class="dock-inner single">
         <button class="btn small" id="btnInstall" style="display:none;">📲 加到主畫面</button>
