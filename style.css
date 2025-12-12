@@ -509,6 +509,27 @@ body{
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
+/* ✅ 強制修正：派對 Modal 內容被裁切 / 畫面太大看不到內容 */
+#partyMask{
+  align-items: center !important;     /* 覆蓋原本 flex-end */
+  justify-content: center !important;
+  padding: 14px !important;
+}
+
+#partyMask .modal{
+  max-height: 92dvh !important;
+  overflow: auto !important;          /* ✅ 關鍵：不要 hidden */
+  -webkit-overflow-scrolling: touch !important;
+
+  border-bottom: 2px solid var(--border) !important; /* 因為不貼底了 */
+  border-radius: 18px !important;
+}
+
+#partyMask .party-card{
+  max-height: 40dvh !important;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
 .load-bear img{width:100%;height:100%;object-fit:cover}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .dots{display:flex; gap:6px; justify-content:center; margin-top:10px;}
