@@ -604,7 +604,8 @@
 (function lockHeroTouch(){
   const hero = document.getElementById("heroTap");
   if(!hero) return;
-
+.hero{ touch-action: manipulation; }
+.hero, .hero *{ -webkit-tap-highlight-color: transparent; }
   // 阻止長按選字 / 拖曳
   hero.addEventListener("dragstart", (e)=>e.preventDefault());
   hero.addEventListener("contextmenu", (e)=>e.preventDefault());
