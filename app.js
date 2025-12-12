@@ -756,7 +756,15 @@ const PARTY_BEAR_LINES = {
 
 let partyMode = null;     // "truth" | "dare"
 let partyLastIndex = -1;
+let partyAlcoholOn = false;
+const partyAlcohol = document.getElementById("partyAlcohol");
 
+partyAlcohol?.addEventListener("change", ()=>{
+  partyAlcoholOn = !!partyAlcohol.checked;
+  if(typeof showToast === "function"){
+    showToast(partyAlcoholOn ? "酒精模式：派對加辣（仍安全）🍸" : "酒精模式已關閉 🌿");
+  }
+});
 const partyMask = document.getElementById("partyMask");
 const partyTitle = document.getElementById("partyTitle");
 const partyType = document.getElementById("partyType");
