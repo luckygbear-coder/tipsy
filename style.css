@@ -126,12 +126,17 @@ body{
 }
 
 .tapHint{
-  position:absolute; right:10px; top:48px;
+  position:absolute;
+  right:12px;
+  bottom:12px;        /* ✅ 改到右下角 */
+  top:auto;           /* ✅ 取消 top */
   background:rgba(255,247,230,.92);
   border:2px dashed var(--border);
-  padding:8px 10px; border-radius:999px;
+  padding:8px 10px;
+  border-radius:999px;
   font-size:12px;
   box-shadow:0 6px 14px rgba(0,0,0,.08);
+  z-index:3;
 }
 
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
