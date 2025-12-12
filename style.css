@@ -398,6 +398,49 @@ body{
   line-height:1.5;
   text-align:center;
 }
+/* 🐻 漫畫對話框：在熊上方，像熊在說話 */
+.comic-bubble{
+  position:absolute;
+  left:16px;
+  right:16px;
+  bottom:92px;              /* ⬅️ 在熊圖片上方 */
+  background:#fff;
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+  font-size:13px;
+  line-height:1.55;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+  z-index:3;
+}
+
+/* 尾巴：往下指熊 */
+.comic-bubble::after{
+  content:"";
+  position:absolute;
+  left:48px;                /* ⬅️ 對齊熊臉偏左 */
+  bottom:-8px;
+  width:14px;
+  height:14px;
+  background:#fff;
+  border-left:2px solid var(--border);
+  border-bottom:2px solid var(--border);
+  transform:rotate(-45deg);
+}
+
+/* 🍇 微醺酒窖：移到最下面，像資訊標籤 */
+.badge{
+  position:absolute;
+  left:12px;
+  bottom:12px;              /* ⬅️ 跑到最下面 */
+  top:auto;
+  background:rgba(255,247,230,.95);
+  border:2px solid var(--border);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  z-index:2;
+}
 
 /* Loading */
 .loading{
