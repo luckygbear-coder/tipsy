@@ -175,7 +175,13 @@
         <button class="filter-btn" data-cat="cocktail">調酒</button>
         <button class="filter-btn" data-cat="na">無酒精</button>
       </div>
-
+<!-- ✅ 新增：心情快速切換（只影響「酒清單」頁籤） -->
+<div class="mood-filters" id="moodFilterRow">
+  <button class="mood-filter-btn active" data-mood="all">全部心情</button>
+  <button class="mood-filter-btn" data-mood="放鬆">😮‍💨 放鬆</button>
+  <button class="mood-filter-btn" data-mood="聊聊">🗣️ 聊聊</button>
+  <button class="mood-filter-btn" data-mood="慶祝">🎉 慶祝</button>
+</div>
       <div class="search" id="searchRow">
         <input id="searchInput" placeholder="搜尋酒名（例如：莫希托 / 威士忌 / 梅酒）" />
         <button class="btn small secondary" id="btnSearchClear">清除</button>
