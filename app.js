@@ -646,7 +646,9 @@ $("btnClearFav").addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV
 
 // ========= 主畫面按鈕 =========
 $("btnIG").addEventListener("click", ()=>window.open(IG_URL, "_blank"));
-
+document.getElementById("btnIGTop")?.addEventListener("click", (e)=>{
+  // 讓 a 連結本身就能開 IG（這裡不阻止預設）
+});
 $("btnRandom").addEventListener("click", async ()=>{
   await withLoading(()=>{
     const pool = getPool();
