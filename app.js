@@ -590,6 +590,19 @@ const filterBtns = Array.from(document.querySelectorAll(".filter-btn"));
 let listTab = "catalog"; // catalog / history / fav
 let catFilter = "all";
 
+// ✅ 新增：酒清單心情快速切換
+let moodFilter = "all"; // all / 放鬆 / 聊聊 / 慶祝
+const moodRow = document.getElementById("moodFilterRow");
+const moodFilterBtns = Array.from(document.querySelectorAll(".mood-filter-btn"));
+
+moodFilterBtns.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    moodFilter = btn.dataset.mood || "all";
+    moodFilterBtns.forEach(x=>x.classList.toggle("active", x.dataset.mood===moodFilter));
+    renderList();
+  });
+});
+
 function openListModal(tab){
   listTab = tab || "catalog";
   listMask?.classList.add("show");
@@ -614,10 +627,9 @@ function setTabs(){
   const showCatalog = (listTab==="catalog");
   if(searchRow) searchRow.style.display = showCatalog ? "flex" : "none";
   if(filterRow) filterRow.style.display = showCatalog ? "flex" : "none";
-
-  const moodRow = document.getElementById("moodFilterRow");
-  if(moodRow) moodRow.style.display = showCatalog ?
+  if(moodRow)   moodRow.style.display   = showCatalog ? "flex" : "none";
 }
+
 $("tabCatalog")?.addEventListener("click", ()=>{ listTab="catalog"; setTabs(); renderList(); });
 $("tabHistory")?.addEventListener("click", ()=>{ listTab="history"; setTabs(); renderList(); });
 $("tabFav")?.addEventListener("click", ()=>{ listTab="fav"; setTabs(); renderList(); });
@@ -630,16 +642,8 @@ filterBtns.forEach(b=>{
     catFilter = b.dataset.cat;
     filterBtns.forEach(x=>x.classList.toggle("active", x.dataset.cat===catFilter));
     renderList();
-    // ✅ 心情快速切換（只作用於 catalog）
-const moodFilterBtns = Array.from(document.querySelectorAll(".mood-filter-btn"));
-moodFilterBtns.forEach(b=>{
-  b.addEventListener("click", ()=>{
-    moodFilter = b.dataset.mood || "all";
-    moodFilterBtns.forEach(x=>x.classList.toggle("active", x.dataset.mood===moodFilter));
-    renderList();
   });
 });
-
 
 function renderList(){
   if(!listContent) return;
@@ -649,11 +653,17 @@ function renderList(){
     const q = (searchInput?.value || "").trim();
     let pool = DRINKS.slice();
 
+    // ✅ 先套用心情快速切換（all/放鬆/聊聊/慶祝）
+    if(moodFilter !== "all") pool = pool.filter(d => (d.moods||[]).includes(moodFilter));
+
+    // 原本分類（beer/white/red/cocktail/spirit/na）
     if(catFilter !== "all") pool = pool.filter(d => d.cat === catFilter);
+
+    // 搜尋
     if(q) pool = pool.filter(d => (d.name + " " + d.tag).includes(q));
 
     if(pool.length===0){
-      listContent.innerHTML = `<div class="smallnote">找不到符合條件的酒～換個分類或關鍵字試試 🐻</div>`;
+      listContent.innerHTML = `<div class="smallnote">找不到符合條件的酒～換個心情 / 分類 / 關鍵字試試 🐻</div>`;
       return;
     }
 
@@ -800,7 +810,6 @@ listContent?.addEventListener("click", async (e)=>{
 // 清空
 $("btnClearHistory")?.addEventListener("click", ()=>{ localStorage.removeItem(KEY_HISTORY); renderList(); showToast("已清空紀錄"); });
 $("btnClearFav")?.addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV); renderList(); if(currentDrink) setFavButton(); showToast("已清空收藏"); });
-
 // ========= 主畫面按鈕 =========
 $("btnRandom")?.addEventListener("click", async ()=>{
   await withLoading(()=>{
