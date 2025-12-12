@@ -792,7 +792,7 @@ function partyBearSpeak(){
 }
 
 function openPartyModal(mode){
-  partyMode = mode;
+  partyTask.textContent = isTruth ? partyPick(getTruthPool()) : partyPick(getDarePool());
 
   // ✅ 同步熊熊頭像（沿用你原本 IMG_TRY 容錯）
   if(partyAvatar){
@@ -821,14 +821,31 @@ function closePartyModal(){
 
 document.getElementById("btnPartyTruth")?.addEventListener("click", ()=>openPartyModal("truth"));
 document.getElementById("btnPartyDare")?.addEventListener("click", ()=>openPartyModal("dare"));
+function decideRandomMode(){
+  // 依心情調整比例（不做「喝越多越刺激」這種）
+  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
+  let pTruth = 0.5; // 真心話機率
+  if(mood === "想聊天") pTruth = 0.7;
+  if(mood === "想慶祝") pTruth = 0.3;
+  if(mood === "清醒也好") pTruth = 0.5;
 
+  return (Math.random() < pTruth) ? "truth" : "dare";
+}
+
+document.getElementById("btnPartyRandom")?.addEventListener("click", ()=>{
+  const m = decideRandomMode();
+  openPartyModal(m);
+  if(typeof showToast === "function"){
+    showToast(m === "truth" ? "隨機：真心話 💬" : "隨機：大冒險 🎯");
+  }
+});
 document.getElementById("partyClose")?.addEventListener("click", closePartyModal);
 partyMask?.addEventListener("click", (e)=>{ if(e.target === partyMask) closePartyModal(); });
 
 document.getElementById("partyNext")?.addEventListener("click", ()=>{
   if(!partyMode) return;
   partyBearLine.textContent = partyBearSpeak();
-  partyTask.textContent = partyMode === "truth" ? partyPick(PARTY_TRUTH_15) : partyPick(PARTY_DARE_15);
+partyTask.textContent = partyMode === "truth" ? partyPick(getTruthPool()) : partyPick(getDarePool());
   if(typeof showToast === "function") showToast("下一題來囉 🎉");
 });
 
