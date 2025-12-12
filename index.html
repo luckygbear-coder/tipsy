@@ -24,7 +24,9 @@
       --pink1:#ffd1f0;
       --pink2:#ffe6fa;
       --mask:rgba(0,0,0,.35);
+      --dockH: 156px; /* ✅ 預留底欄高度，避免裁切 */
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -32,14 +34,17 @@
       background:var(--bg);
       font-family:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       color:var(--text);
-      overflow:hidden; /* ✅ 手機螢幕完全呈現 */
+      overflow:hidden; /* ✅ 主體不捲動，交給 main / modal 捲 */
     }
 
+    /* ✅ iOS 正確滿版：用 dvh + 預留底欄空間 */
     .app{
-      height:100vh;
+      min-height: 100dvh;
       display:flex;
       flex-direction:column;
+      padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom));
     }
+
     .header{padding:14px 14px 10px;}
     .topbar{
       display:flex; gap:12px; align-items:center;
@@ -58,13 +63,16 @@
     .title h1{margin:0;font-size:18px;letter-spacing:.4px}
     .title p{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.35}
 
+    /* ✅ 主內容可以捲動、不被底欄壓住 */
     .main{
       flex:1;
-      padding:0 14px 0;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding:0 14px 10px;
       display:flex;
       flex-direction:column;
       gap:12px;
-      min-height:0;
     }
 
     .hero{
@@ -75,7 +83,7 @@
       background:#fff;
       position:relative;
       flex:1;
-      min-height:0;
+      min-height:220px;
     }
     .hero img{width:100%;height:100%;object-fit:cover;display:block}
     .badge{
@@ -107,11 +115,9 @@
     .btn.secondary{background:#fff;}
     .btn.ig{background:linear-gradient(180deg,var(--pink1),var(--pink2));}
     .btn.small{padding:10px 10px; font-size:13px; border-radius:14px;}
+    .btn.ghost{background:#fff; border-style:dashed;}
 
-    .moods{
-      display:flex; flex-wrap:wrap;
-      gap:8px; align-items:center;
-    }
+    .moods{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
     .mood-btn{
       border:none; cursor:pointer;
       background:#fff;
@@ -132,7 +138,12 @@
       align-self:flex-start;
     }
 
+    /* ✅ 底欄固定，不裁切 */
     .dock{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      z-index:70;
+
       padding:10px 14px calc(10px + env(safe-area-inset-bottom));
       background:rgba(255,247,230,.95);
       border-top:2px solid var(--border);
@@ -145,7 +156,7 @@
 
     /* Toast */
     .toast{
-      position:fixed; left:50%; bottom:92px;
+      position:fixed; left:50%; bottom:calc(var(--dockH) + 14px);
       transform:translateX(-50%);
       background:rgba(75,48,68,.92);
       color:#fff;
@@ -179,7 +190,8 @@
       border-radius:18px 18px 0 0;
       box-shadow:0 -12px 30px rgba(0,0,0,.22);
       padding:14px;
-      max-height:88vh;
+
+      max-height: 88dvh; /* ✅ iOS 不忽大忽小 */
       overflow:hidden;
     }
     .modal-head{
@@ -198,7 +210,7 @@
       user-select:none;
     }
 
-    /* 熊熊對話 */
+    /* 熊熊對話（可點換句） */
     .chat-row{display:flex; gap:10px; align-items:flex-start; margin-top:6px;}
     .avatar{
       width:42px;height:42px;border-radius:14px;
@@ -216,6 +228,7 @@
       position:relative;
       font-size:13px; line-height:1.55;
       white-space:pre-wrap;
+      cursor:pointer;
     }
     .bubble:before{
       content:"";
@@ -225,6 +238,13 @@
       border-left:2px solid var(--border);
       border-bottom:2px solid var(--border);
       transform:rotate(45deg);
+    }
+    .bubble-tip{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:right;
+      user-select:none;
     }
 
     /* 酒卡 */
@@ -249,9 +269,10 @@
 
     .content{
       overflow:auto;
-      max-height:58vh;
+      max-height:58dvh;
       padding-right:4px;
       margin-top:10px;
+      -webkit-overflow-scrolling: touch;
     }
     .block{margin-top:10px}
     .label{font-size:12px;color:var(--muted);margin-bottom:4px}
@@ -266,7 +287,7 @@
     }
     .warn{background:#fff1f1;border:1px solid rgba(176,71,71,.35);color:#6a2b2b;}
 
-    /* 清單 / 歷史 / 收藏 tabs */
+    /* tabs + 分類 */
     .tabs{display:flex; gap:8px; margin:10px 0;}
     .tab{
       flex:1;
@@ -281,16 +302,31 @@
     }
     .tab.active{background:linear-gradient(180deg,#fff0c8,#fff7e6);}
 
-    .search{
-      display:flex; gap:8px; align-items:center;
+    .filters{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
       margin:6px 0 10px;
     }
+    .filter-btn{
+      border:none; cursor:pointer;
+      background:#fff;
+      border:2px solid rgba(225,182,118,.7);
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:12px;
+      box-shadow:0 3px 8px rgba(0,0,0,.07);
+      user-select:none;
+    }
+    .filter-btn.active{background:linear-gradient(180deg,#fff0c8,#fff7e6);}
+
+    .search{display:flex; gap:8px; align-items:center; margin:6px 0 10px;}
     .search input{
       flex:1;
       border:2px solid rgba(225,182,118,.7);
       border-radius:14px;
       padding:10px 12px;
-      font-size:13px;
+      font-size:16px; /* ✅ 防止 iOS 點輸入框自動放大 */
       outline:none;
       background:#fff;
     }
@@ -356,6 +392,23 @@
     .dot:nth-child(2){animation-delay:.15s}
     .dot:nth-child(3){animation-delay:.3s}
     @keyframes blink{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px);opacity:1}}
+
+    /* 記住心情 input */
+    .memo-wrap{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+    }
+    .memo-wrap input{
+      flex:1;
+      border:2px solid rgba(225,182,118,.7);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:16px; /* ✅ 防止 iOS 放大 */
+      outline:none;
+      background:#fff;
+    }
   </style>
 </head>
 
@@ -366,7 +419,7 @@
         <div class="logo"><img id="bearIconTop" alt="微醺熊"></div>
         <div class="title">
           <h1>找微醺熊講心事 🐻🍷</h1>
-          <p id="todayLine">「今晚不用很堅強，微醺就好。」</p>
+          <p id="todayLine">「今天的你辛苦了，來一口溫柔。」</p>
         </div>
       </div>
     </div>
@@ -424,7 +477,7 @@
     </div>
   </div>
 
-  <!-- Modal：酒卡（含熊熊氣泡） -->
+  <!-- Modal：酒卡 -->
   <div class="modal-mask" id="drinkMask">
     <div class="modal">
       <div class="modal-head">
@@ -434,7 +487,10 @@
 
       <div class="chat-row">
         <div class="avatar"><img id="bearAvatar" alt="微醺熊"></div>
-        <div class="bubble" id="bearBubble">🐻「我在這裡，慢慢來。」</div>
+        <div style="flex:1">
+          <div class="bubble" id="bearBubble" title="點我換一句熊熊話 🐻">🐻「我在這裡，慢慢來。」</div>
+          <div class="bubble-tip">（點一下熊熊話語，可以換一句）</div>
+        </div>
       </div>
 
       <div class="drink-head">
@@ -467,6 +523,15 @@
           <div class="label">⚠️ 提醒</div>
           <div class="text warn" id="drinkWarn">—</div>
         </div>
+
+        <!-- ✅ 今晚我想記住 -->
+        <div class="block">
+          <div class="label">📝 今晚我想記住</div>
+          <div class="memo-wrap">
+            <input id="memoInput" placeholder="輸入一句你想記住的心情（例如：我其實很努力了）" maxlength="60" />
+            <button class="btn small" id="btnSaveMemo">保存</button>
+          </div>
+        </div>
       </div>
 
       <div class="row2" style="margin-top:10px;">
@@ -478,7 +543,7 @@
     </div>
   </div>
 
-  <!-- Modal：清單/歷史/收藏（同一個視窗） -->
+  <!-- Modal：清單/歷史/收藏 -->
   <div class="modal-mask" id="listMask">
     <div class="modal">
       <div class="modal-head">
@@ -492,12 +557,23 @@
         <button class="tab" id="tabFav">⭐ 收藏</button>
       </div>
 
+      <!-- ✅ 分類篩選 -->
+      <div class="filters" id="filterRow">
+        <button class="filter-btn active" data-cat="all">全部</button>
+        <button class="filter-btn" data-cat="beer">啤酒</button>
+        <button class="filter-btn" data-cat="red">紅酒</button>
+        <button class="filter-btn" data-cat="white">白酒</button>
+        <button class="filter-btn" data-cat="spirit">烈酒</button>
+        <button class="filter-btn" data-cat="cocktail">調酒</button>
+        <button class="filter-btn" data-cat="na">無酒精</button>
+      </div>
+
       <div class="search" id="searchRow">
         <input id="searchInput" placeholder="搜尋酒名（例如：莫希托 / 威士忌 / 梅酒）" />
         <button class="btn small secondary" id="btnSearchClear">清除</button>
       </div>
 
-      <div class="content" id="listContent" style="max-height:64vh;"></div>
+      <div class="content" id="listContent" style="max-height:64dvh;"></div>
 
       <div class="row2" style="margin-top:10px;">
         <button class="btn small secondary" id="btnClearHistory">清空歷史</button>
@@ -524,8 +600,8 @@
 
     // ========= 基本 =========
     const IG_URL = "https://instagram.com/luckygbear";
-    const KEY_HISTORY = "tipsyBear_history_v3";
-    const KEY_FAV = "tipsyBear_fav_v3";
+    const KEY_HISTORY = "tipsyBear_history_v5";
+    const KEY_FAV = "tipsyBear_fav_v5";
 
     const $ = (id)=>document.getElementById(id);
     const toast = $("toast");
@@ -547,14 +623,24 @@
     function addHistory(entry){
       const list = getHistory();
       list.unshift(entry);
-      setHistory(list.slice(0, 80));
+      setHistory(list.slice(0, 120));
+    }
+    function updateHistoryMemo(ts, memo){
+      const list = getHistory();
+      const i = list.findIndex(x => x.ts === ts);
+      if(i >= 0){
+        list[i].memo = memo;
+        setHistory(list);
+        return true;
+      }
+      return false;
     }
     function toggleFav(drinkId){
       const list = getFav();
       const i = list.indexOf(drinkId);
       if(i>=0){ list.splice(i,1); setFav(list); return false; }
       list.unshift(drinkId);
-      setFav(Array.from(new Set(list)).slice(0, 120));
+      setFav(Array.from(new Set(list)).slice(0, 200));
       return true;
     }
     function isFav(drinkId){ return getFav().includes(drinkId); }
@@ -591,213 +677,219 @@
       "清醒也好": ["🐻「清醒也很棒，我們用安全的方式照顧你。」","🐻「我更在意你平安回家。」"]
     };
 
-    // ========= 酒資料（33 種） =========
-    // 每杯都有：故事 / 風味氣味 / 特性 / 提醒 / 追問
+    const BEAR_EXTRA_LINES = [
+      "🐻「你願意說到哪裡都可以，我都聽。」",
+      "🐻「你不需要很快好起來，慢慢來就好。」",
+      "🐻「你已經很努力了，真的。」",
+      "🐻「今晚我們只做一件事：好好照顧你。」",
+      "🐻「如果你想哭，也沒關係。」",
+      "🐻「你不是一個人，我在這裡。」",
+      "🐻「我可以陪你把今天收起來。」"
+    ];
+
+    // ========= 酒資料（33 杯 + 分類 cat） =========
+    // cat: beer / red / white / spirit / cocktail / na
     const DRINKS = [
-      // 啤酒 6
-      {id:1, emoji:"🍺", name:"拉格（Lager）", tag:"清爽・順口・日常小確幸", moods:["開心","疲憊","想聊天"],
+      {id:1, cat:"beer", emoji:"🍺", name:"拉格（Lager）", tag:"清爽・順口・日常小確幸", moods:["開心","疲憊","想聊天"],
         story:"拉格像把一天的汗與煩躁洗掉：乾淨、清爽、很可靠。",
         flavor:"清爽麥香、淡淡啤酒花、收口乾淨。",
         trait:"社交友善、適合慢慢聊、易入口。",
-        warn:"別空腹；如果你容易脹氣，配點食物更舒服。",
+        warn:"別空腹；容易脹氣者配點食物更舒服。",
         followUps:["你今天最想洗掉的是哪一件事？","你想先被安慰，還是先被理解？","今天你最累的地方是哪裡？"]},
-      {id:2, emoji:"🍺", name:"皮爾森（Pilsner）", tag:"乾爽・俐落・啤酒花香", moods:["疲憊","想放下","想聊天"],
+      {id:2, cat:"beer", emoji:"🍺", name:"皮爾森（Pilsner）", tag:"乾爽・俐落・啤酒花香", moods:["疲憊","想放下","想聊天"],
         story:"像把『今天』切成俐落的一刀：清、脆、乾爽，思緒會更乾淨。",
         flavor:"啤酒花香更明顯、苦韻俐落、清爽。",
         trait:"清醒感高、適合整理心情。",
         warn:"酸苦感可能刺激胃，請搭配食物。",
         followUps:["你腦袋裡最吵的那句話是什麼？","你想把哪段思緒先放下？","你需要答案，還是需要休息？"]},
-      {id:3, emoji:"🍺", name:"艾爾（Ale）", tag:"麥香溫暖・耐聊", moods:["想聊天","疲憊","想放下"],
+      {id:3, cat:"beer", emoji:"🍺", name:"艾爾（Ale）", tag:"麥香溫暖・耐聊", moods:["想聊天","疲憊","想放下"],
         story:"艾爾像會陪你聊的朋友：溫暖、有香氣，讓心事變好說。",
         flavor:"較厚的麥芽香、可能帶果香/焦糖感。",
         trait:"溫暖耐聊、情緒安撫感強。",
         warn:"酒感比拉格明顯，別急著喝快。",
         followUps:["你想把心事說給誰聽？","你希望今晚的聊天偏溫柔還是直接？","最想被理解的是哪一件事？"]},
-      {id:4, emoji:"🍺", name:"IPA", tag:"苦香醒腦・反差回甘", moods:["想放下","想聊天","開心"],
+      {id:4, cat:"beer", emoji:"🍺", name:"IPA", tag:"苦香醒腦・反差回甘", moods:["想放下","想聊天","開心"],
         story:"先苦後回甘像成長：承認累，才會回甜。",
         flavor:"啤酒花爆香、柑橘/松針感、苦韻明顯。",
         trait:"轉換情緒、醒腦、個性鮮明。",
         warn:"初學者少量；苦味可能讓你喝更快，記得慢。",
         followUps:["你覺得苦的是事情，還是期待？","你想要回甘的那一刻長什麼樣？","你願意為自己勇敢一次嗎？"]},
-      {id:5, emoji:"🍺", name:"小麥啤酒（Wheat）", tag:"柔和果香・像雲", moods:["疲憊","開心","想聊天"],
+      {id:5, cat:"beer", emoji:"🍺", name:"小麥啤酒（Wheat）", tag:"柔和果香・像雲", moods:["疲憊","開心","想聊天"],
         story:"像一團雲把你包住：不刺、不硬，緊繃會鬆一點。",
         flavor:"柔和麥香、可能有香蕉/丁香般的輕果香（依風格）。",
         trait:"口感圓潤、很溫柔、好入口。",
         warn:"對麩質敏感者避免；甜感也容易喝多。",
         followUps:["你想對自己溫柔一點的是哪裡？","你今天有沒有想被抱抱的瞬間？","你願意放過自己一次嗎？"]},
-      {id:6, emoji:"🍺", name:"黑啤（Stout）", tag:"可可烘焙・夜晚擁抱", moods:["想放下","疲憊","想聊天"],
+      {id:6, cat:"beer", emoji:"🍺", name:"黑啤（Stout）", tag:"可可烘焙・夜晚擁抱", moods:["想放下","疲憊","想聊天"],
         story:"厚厚的黑啤像夜晚的抱抱：慢慢喝，心也慢慢安。",
         flavor:"可可/咖啡烘焙香、焦糖感、厚實。",
         trait:"安定、陪伴感強、適合獨處沉澱。",
         warn:"口感濃別猛灌；配甜點/鹹食都很棒。",
         followUps:["你想被包住的是哪一種孤單？","今晚你最需要安慰還是肯定？","你願意允許自己慢下來嗎？"]},
 
-      // 葡萄酒 6
-      {id:7, emoji:"🍷", name:"卡本內蘇維濃", tag:"成熟有力・結構感紅酒", moods:["想放下","想聊天","想慶祝"],
+      {id:7, cat:"red", emoji:"🍷", name:"卡本內蘇維濃", tag:"成熟有力・結構感紅酒", moods:["想放下","想聊天","想慶祝"],
         story:"像一位有肩膀的大人：你可以靠一下，然後想起你其實也很強。",
         flavor:"黑醋栗、木質、單寧感較明顯。",
         trait:"儀式感、撐住自己、適合配餐慢聊。",
         warn:"酒感較強，搭配食物更舒服。",
         followUps:["你最近最撐的是哪件事？","你願意把責任放下一點點嗎？","你想替自己立哪個界線？"]},
-      {id:8, emoji:"🍷", name:"梅洛（Merlot）", tag:"柔順圓潤・溫柔紅酒", moods:["疲憊","想聊天","想放下"],
+      {id:8, cat:"red", emoji:"🍷", name:"梅洛（Merlot）", tag:"柔順圓潤・溫柔紅酒", moods:["疲憊","想聊天","想放下"],
         story:"它不逼你勇敢，只輕輕說：你已經做得很好了。",
         flavor:"紅莓/李子、柔順、單寧較圓。",
         trait:"安慰系、易入口、適合放鬆談心。",
         warn:"甜柔容易喝多；慢慢來。",
         followUps:["你希望有人對你說『你很好』嗎？","你最想被稱讚的一件事是？","你願意把標準放鬆一點嗎？"]},
-      {id:9, emoji:"🥂", name:"夏多內（Chardonnay）", tag:"白酒經典・柔光質地", moods:["想慶祝","開心","想聊天"],
+
+      {id:9, cat:"white", emoji:"🥂", name:"夏多內（Chardonnay）", tag:"白酒經典・柔光質地", moods:["想慶祝","開心","想聊天"],
         story:"像把日子調成柔光：舒服不刺眼，讓你願意對自己更好。",
-        flavor:"蘋果/柑橘、部分風格帶奶油/烤麵包感。",
-        trait:"優雅放鬆、很適合犒賞自己。",
+        flavor:"蘋果/柑橘；部分風格帶奶油/烤麵包感。",
+        trait:"優雅放鬆、適合犒賞自己。",
         warn:"別冰過頭；太冰會壓掉香氣。",
         followUps:["你想怎麼犒賞自己？","你今天值得被好好對待的理由是？","你願意對自己說『我值得』嗎？"]},
-      {id:10, emoji:"🥂", name:"白蘇維濃（Sauvignon Blanc）", tag:"清新草本・像清晨", moods:["清醒也好","疲憊","想放下"],
+      {id:10, cat:"white", emoji:"🥂", name:"白蘇維濃（Sauvignon Blanc）", tag:"清新草本・像清晨", moods:["清醒也好","疲憊","想放下"],
         story:"像早晨開窗那口風：清爽、明亮，讓你想重新開始。",
         flavor:"草本、柑橘、酸度明亮。",
         trait:"重啟感、清醒感高、很解膩。",
         warn:"胃酸敏感者配食物；慢喝。",
         followUps:["你想重新開始的第一步是？","你願意把今天當練習嗎？","你最想清爽掉的是什麼？"]},
-      {id:11, emoji:"🍷", name:"粉紅酒（Rosé）", tag:"輕盈可愛・剛剛好", moods:["開心","想慶祝","想聊天"],
+
+      {id:11, cat:"white", emoji:"🍷", name:"粉紅酒（Rosé）", tag:"輕盈可愛・剛剛好", moods:["開心","想慶祝","想聊天"],
         story:"像一句剛剛好的稱讚：不過度、不敷衍，很剛好。",
         flavor:"莓果、花香、輕盈微甜（依風格）。",
         trait:"聊天局王者、輕鬆好心情。",
         warn:"甜口更容易不知不覺喝多。",
         followUps:["你想把今晚變可愛一點嗎？","你想對誰說一句好話？","你最近的小幸福是什麼？"]},
-      {id:12, emoji:"🥂", name:"氣泡酒（Sparkling）", tag:"泡泡儀式感・把日子變亮", moods:["想慶祝","開心","想聊天"],
+      {id:12, cat:"white", emoji:"🥂", name:"氣泡酒（Sparkling）", tag:"泡泡儀式感・把日子變亮", moods:["想慶祝","開心","想聊天"],
         story:"每個泡泡都在說：你值得開心。小快樂也值得乾杯。",
         flavor:"清脆氣泡、果香、收口俐落。",
         trait:"儀式感、提亮氣氛、最會慶祝。",
         warn:"氣泡會加速吸收，慢慢喝。",
         followUps:["你想為哪件小事乾杯？","今天最亮的瞬間是？","你願意把快樂留久一點嗎？"]},
 
-      // 烈酒 6
-      {id:13, emoji:"🥃", name:"威士忌（Whisky）", tag:"深沉木質・慢慢聊", moods:["想聊天","想放下","疲憊"],
+      {id:13, cat:"spirit", emoji:"🥃", name:"威士忌（Whisky）", tag:"深沉木質・慢慢聊", moods:["想聊天","想放下","疲憊"],
         story:"像深夜對話：不急著結論，只陪你把真心說完。",
         flavor:"木質、香草、焦糖（依桶陳）。",
         trait:"沉澱、很有故事、適合小口慢喝。",
         warn:"酒精濃度高，小口即可。",
         followUps:["你最想說的真心是哪句？","你想要陪伴還是方向？","你希望被怎麼理解？"]},
-      {id:14, emoji:"🥃", name:"波本（Bourbon）", tag:"香草焦糖・像壁爐", moods:["疲憊","想放下","想聊天"],
+      {id:14, cat:"spirit", emoji:"🥃", name:"波本（Bourbon）", tag:"香草焦糖・像壁爐", moods:["疲憊","想放下","想聊天"],
         story:"像冬夜的毯子：甜甜的，但不膩，讓你想照顧自己。",
         flavor:"香草、焦糖、烤橡木。",
         trait:"溫暖安定、很療癒。",
         warn:"甜感會讓人低估酒精，小心。",
         followUps:["你今天最想被照顧的是心還是身體？","你願意對自己溫暖一下嗎？","你想把壓力放到哪裡？"]},
-      {id:15, emoji:"🥃", name:"蘇格蘭（Scotch）", tag:"煙燻泥煤・回憶感", moods:["想放下","想聊天","想慶祝"],
+      {id:15, cat:"spirit", emoji:"🥃", name:"蘇格蘭（Scotch）", tag:"煙燻泥煤・回憶感", moods:["想放下","想聊天","想慶祝"],
         story:"煙燻像回憶：有些刺、有些暖，入口後更懂自己。",
         flavor:"煙燻、泥煤、海風鹹感（依產區）。",
         trait:"個性強、適合慢慢品、很有故事。",
         warn:"初次可加一點水；不要急喝。",
         followUps:["那段回憶你想留著還是放下？","你願意原諒當時的自己嗎？","你想讓那團煙散去哪？"]},
-      {id:16, emoji:"🍸", name:"琴酒（Gin）", tag:"草本清醒・俐落微醺", moods:["清醒也好","想聊天","開心"],
+      {id:16, cat:"spirit", emoji:"🍸", name:"琴酒（Gin）", tag:"草本清醒・俐落微醺", moods:["清醒也好","想聊天","開心"],
         story:"像把腦袋整理好：清爽俐落，但仍有香氣的情緒。",
         flavor:"杜松子、草本、柑橘皮香。",
         trait:"清爽、適合聊天、很有層次。",
         warn:"搭配含糖飲很容易喝快，記得慢。",
         followUps:["你想清醒地守住什麼？","你想把混亂整理成哪三個字？","你願意先把自己放回中心嗎？"]},
-      {id:17, emoji:"🍸", name:"伏特加（Vodka）", tag:"乾淨中性・很好配", moods:["想慶祝","想聊天","清醒也好"],
+      {id:17, cat:"spirit", emoji:"🍸", name:"伏特加（Vodka）", tag:"乾淨中性・很好配", moods:["想慶祝","想聊天","清醒也好"],
         story:"像白紙：你怎麼搭，它就怎麼陪你。你可以決定今晚味道。",
         flavor:"乾淨、酒感直接、香氣少。",
         trait:"百搭基底、適合做調酒。",
         warn:"順口不代表弱，請慢慢喝。",
         followUps:["你想把今晚調成什麼味道？","你最想自己決定的是什麼？","你願意為自己選一次嗎？"]},
-      {id:18, emoji:"🥃", name:"龍舌蘭（Tequila）", tag:"陽光冒險・直球熱烈", moods:["想慶祝","開心","想放下"],
+      {id:18, cat:"spirit", emoji:"🥃", name:"龍舌蘭（Tequila）", tag:"陽光冒險・直球熱烈", moods:["想慶祝","開心","想放下"],
         story:"像沙漠太陽：直接、熱烈。喝的不是刺激，是勇敢。",
-        flavor:"龍舌蘭植物香、胡椒感、乾爽收口。",
+        flavor:"植物香、胡椒感、乾爽收口。",
         trait:"熱情、轉頻道、很有力量。",
         warn:"別連續 shot；慢喝最安全。",
         followUps:["你想冒險的是哪個小步？","你願意勇敢一次會選哪件事？","你想把熱情放回哪裡？"]},
 
-      // 經典調酒 9
-      {id:19, emoji:"🍸", name:"莫希托（Mojito）", tag:"薄荷清爽・透氣自由", moods:["開心","疲憊","想放下"],
+      {id:19, cat:"cocktail", emoji:"🍸", name:"莫希托（Mojito）", tag:"薄荷清爽・透氣自由", moods:["開心","疲憊","想放下"],
         story:"像把心裡的悶打開一條縫：讓你呼吸到自由。",
         flavor:"薄荷、萊姆清酸、氣泡清爽。",
         trait:"很解悶、很夏天、最會讓人放鬆。",
         warn:"清爽很容易喝多，慢慢喝。",
         followUps:["你想吐掉的那口悶氣是什麼？","你想自由的是工作還是關係？","你願意先讓自己喘口氣嗎？"]},
-      {id:20, emoji:"🍸", name:"瑪格麗特（Margarita）", tag:"酸甜鹽邊・有態度", moods:["想放下","想慶祝","開心"],
+      {id:20, cat:"cocktail", emoji:"🍸", name:"瑪格麗特（Margarita）", tag:"酸甜鹽邊・有態度", moods:["想放下","想慶祝","開心"],
         story:"鹽邊像界線：你可以溫柔，但不必委屈自己。",
         flavor:"萊姆酸、龍舌蘭、鹽邊提味。",
         trait:"俐落、很有底氣、適合對自己誠實。",
         warn:"酸度高；胃敏感者搭食物。",
         followUps:["你最想對哪件事說『不』？","你想守護的界線是什麼？","你願意把自己放第一位一次嗎？"]},
-      {id:21, emoji:"🥃", name:"老古典（Old Fashioned）", tag:"經典穩重・慢甜", moods:["想聊天","想放下","疲憊"],
+      {id:21, cat:"cocktail", emoji:"🥃", name:"老古典（Old Fashioned）", tag:"經典穩重・慢甜", moods:["想聊天","想放下","疲憊"],
         story:"不追流行，只把基本做好。像你：其實很可靠。",
         flavor:"威士忌、糖、苦精、橙皮香。",
         trait:"沉穩耐聊、很成熟的甜。",
         warn:"濃度高，小口就很夠。",
         followUps:["你最可靠的一面是什麼？","你願意承認你也需要被照顧嗎？","你想把生活變簡單一點嗎？"]},
-      {id:22, emoji:"🍸", name:"尼格羅尼（Negroni）", tag:"苦甜平衡・成熟反差", moods:["想放下","想聊天","想慶祝"],
+      {id:22, cat:"cocktail", emoji:"🍸", name:"尼格羅尼（Negroni）", tag:"苦甜平衡・成熟反差", moods:["想放下","想聊天","想慶祝"],
         story:"先苦後回甘：不是每次都舒服，但會更懂自己。",
         flavor:"苦甜草本、柑橘皮香、尾韻長。",
         trait:"成熟系、很有層次、適合慢品。",
         warn:"苦感明顯，初學者少量。",
         followUps:["你最近在練習的成熟是什麼？","你願意把『苦』說出口嗎？","回甘那刻你想對自己說什麼？"]},
-      {id:23, emoji:"🍸", name:"馬丁尼（Martini）", tag:"極簡乾淨・高冷優雅", moods:["清醒也好","想放下","想聊天"],
+      {id:23, cat:"cocktail", emoji:"🍸", name:"馬丁尼（Martini）", tag:"極簡乾淨・高冷優雅", moods:["清醒也好","想放下","想聊天"],
         story:"像一句短句：不多，但很準。今晚不解釋也可以。",
         flavor:"琴酒/伏特加基底、乾淨草本、可能帶橄欖鹹香。",
         trait:"俐落、界線感、很優雅。",
         warn:"濃度高，慢慢喝。",
         followUps:["你今天最想停止解釋的是什麼？","你想讓哪段關係更乾淨？","你願意回到自己的中心嗎？"]},
-      {id:24, emoji:"🍸", name:"琴通寧（Gin Tonic）", tag:"清爽草本・簡單耐喝", moods:["清醒也好","開心","想聊天"],
+      {id:24, cat:"cocktail", emoji:"🍸", name:"琴通寧（Gin Tonic）", tag:"清爽草本・簡單耐喝", moods:["清醒也好","開心","想聊天"],
         story:"像把今天清掉：你不必贏，只要把自己照顧好。",
         flavor:"杜松草本＋通寧微苦＋氣泡。",
         trait:"清爽、耐喝、聊天好朋友。",
         warn:"氣泡加速吸收；慢喝。",
         followUps:["你想把今天清掉的第一件事是？","你需要放鬆還是肯定？","你願意把照顧自己當目標嗎？"]},
-      {id:25, emoji:"🍅", name:"血腥瑪麗（Bloody Mary）", tag:"香料番茄・醒腦湯感", moods:["清醒也好","想聊天","疲憊"],
+      {id:25, cat:"cocktail", emoji:"🍅", name:"血腥瑪麗（Bloody Mary）", tag:"香料番茄・醒腦湯感", moods:["清醒也好","想聊天","疲憊"],
         story:"像一碗勇敢的湯：有點辣、有點鹹，喝完會覺得我還可以。",
         flavor:"番茄、香料、胡椒/芹菜感（依配方）。",
         trait:"提神、很有個性、適合早午餐。",
         warn:"含鹽香料；血壓/腎臟需留意者慎飲。",
         followUps:["你想叫醒的是哪個念頭？","你願意為自己打氣一句嗎？","你的『還可以』來自哪裡？"]},
-      {id:26, emoji:"🥃", name:"威士忌酸（Whiskey Sour）", tag:"酸甜平衡・柔和轉折", moods:["想放下","想聊天","疲憊"],
+      {id:26, cat:"cocktail", emoji:"🥃", name:"威士忌酸（Whiskey Sour）", tag:"酸甜平衡・柔和轉折", moods:["想放下","想聊天","疲憊"],
         story:"像一句道歉：不卑微、不逞強，只是把關係拉回剛剛好。",
         flavor:"檸檬酸、威士忌、甜度平衡，可能帶蛋白泡沫。",
         trait:"柔和、修補感、很順口。",
         warn:"酸度＋酒精都在，慢慢喝。",
         followUps:["你想修補的是關係，還是你自己？","你最想對誰說一句真話？","你願意給自己一個轉折嗎？"]},
-      {id:27, emoji:"🍹", name:"長島冰茶（Long Island Iced Tea）", tag:"看似溫柔其實很猛", moods:["想慶祝","想聊天","開心"],
+      {id:27, cat:"cocktail", emoji:"🍹", name:"長島冰茶（Long Island Iced Tea）", tag:"看似溫柔其實很猛", moods:["想慶祝","想聊天","開心"],
         story:"像『看起來沒事』的你：表面輕鬆，裡面其實撐很久。",
         flavor:"多基酒混合、柑橘與可樂感、酒感隱藏。",
         trait:"派對感強、但要很克制。",
         warn:"濃度高！務必慢喝；喝酒不開車。",
         followUps:["你有哪件事其實撐很久？","你願意讓自己不用假裝嗎？","你想把負擔交給誰一點點？"]},
 
-      // 東方酒 4
-      {id:28, emoji:"🍶", name:"清酒（日本酒）", tag:"米香柔和・安靜陪伴", moods:["想聊天","想放下","疲憊"],
+      {id:28, cat:"spirit", emoji:"🍶", name:"清酒（日本酒）", tag:"米香柔和・安靜陪伴", moods:["想聊天","想放下","疲憊"],
         story:"像靜靜點燈：不吵，但讓你覺得有人在。",
         flavor:"米香、柔和甜旨、尾韻乾淨（依風格）。",
         trait:"很安靜、很溫柔、適合沉澱。",
         warn:"別猛灌；溫飲/冷飲皆可。",
         followUps:["你想要安靜，還是被理解？","你願意讓自己被陪一下嗎？","今晚你想把心放在哪？"]},
-      {id:29, emoji:"🍑", name:"梅酒", tag:"酸甜果香・可愛但別小看", moods:["開心","想聊天","想慶祝"],
+      {id:29, cat:"cocktail", emoji:"🍑", name:"梅酒", tag:"酸甜果香・可愛但別小看", moods:["開心","想聊天","想慶祝"],
         story:"像一句撒嬌：甜甜帶酸，讓心變得好打開。",
         flavor:"梅子果香、酸甜平衡、柔順。",
         trait:"輕鬆、親切、很適合聊天。",
         warn:"甜口很容易喝多；慢慢喝。",
         followUps:["你願意對自己撒嬌一下嗎？","你今天想要的甜是哪一種？","你最近的小確幸是什麼？"]},
-      {id:30, emoji:"🍶", name:"紹興酒", tag:"醇厚米香・家常溫暖", moods:["疲憊","想放下","想聊天"],
+      {id:30, cat:"spirit", emoji:"🍶", name:"紹興酒", tag:"醇厚米香・家常溫暖", moods:["疲憊","想放下","想聊天"],
         story:"像長輩的關心：不花俏，但很真。有時被照顧很幸福。",
         flavor:"米麴香、醇厚、溫暖尾韻。",
         trait:"安定、家常感、很適合配餐。",
         warn:"酒感厚；搭配食物更舒服。",
         followUps:["你最近有被好好照顧嗎？","你願意照顧自己一下嗎？","你最想回到的『家』是什麼感覺？"]},
-      {id:31, emoji:"🥃", name:"高粱酒", tag:"直球辛香・存在感強", moods:["想放下","想慶祝","想聊天"],
+      {id:31, cat:"spirit", emoji:"🥃", name:"高粱酒", tag:"直球辛香・存在感強", moods:["想放下","想慶祝","想聊天"],
         story:"像一句真話：不拐彎抹角。但真話也要溫柔地說。",
         flavor:"辛香、穀物香、酒感直接。",
         trait:"果斷、斷捨離感、很有力量。",
         warn:"濃度高！小口即可，避免連續杯。",
         followUps:["你最想說的真話是什麼？","你想把哪個糾結斷開？","你願意溫柔但堅定一次嗎？"]},
 
-      // 低酒精/無酒精 2
-      {id:32, emoji:"🫧", name:"無酒精調酒（Mocktail）", tag:"不喝也很酷・享受氛圍", moods:["清醒也好","疲憊","想放下","想聊天","開心"],
+      {id:32, cat:"na", emoji:"🫧", name:"無酒精調酒（Mocktail）", tag:"不喝也很酷・享受氛圍", moods:["清醒也好","疲憊","想放下","想聊天","開心"],
         story:"你不需要酒精才能放鬆。你值得的是被好好對待的夜晚。",
         flavor:"依配方：果香/草本/氣泡，清爽感高。",
         trait:"安全第一、氣氛滿分、很適合開車前。",
         warn:"仍可能含糖較高；注意攝取。",
         followUps:["今晚不喝酒也沒關係，你想怎麼溫柔自己？","你願意把安全放第一嗎？","如果只選一個舒服的小事，你選什麼？"]},
-      {id:33, emoji:"🥂", name:"低酒精氣泡調飲", tag:"微甜微醺・輕盈不負擔", moods:["開心","想慶祝","疲憊","想聊天"],
+      {id:33, cat:"na", emoji:"🥂", name:"低酒精氣泡調飲", tag:"微甜微醺・輕盈不負擔", moods:["開心","想慶祝","疲憊","想聊天"],
         story:"像把疲憊調得更輕：不硬撐，也不放縱。剛剛好最美。",
         flavor:"輕果香、細緻氣泡、甜度柔和。",
         trait:"輕盈、好入口、保留清醒感。",
@@ -808,6 +900,8 @@
     // ========= 狀態 =========
     let currentMood = null;
     let currentDrink = null;
+    let currentHistoryTs = null; // ✅ 這次紀錄 ts，用於寫 memo
+    let bearLineFactory = null;  // ✅ 點氣泡換句
 
     function findDrink(id){ return DRINKS.find(d=>d.id===id) || null; }
     function getPool(){
@@ -830,26 +924,28 @@
 
     // ========= 酒卡跳窗 =========
     const drinkMask = $("drinkMask");
-    function openDrinkModal(){
-      drinkMask.classList.add("show");
-    }
-    function closeDrinkModal(){
-      drinkMask.classList.remove("show");
-    }
+    function openDrinkModal(){ drinkMask.classList.add("show"); }
+    function closeDrinkModal(){ drinkMask.classList.remove("show"); }
     $("drinkClose").addEventListener("click", closeDrinkModal);
     drinkMask.addEventListener("click", (e)=>{ if(e.target===drinkMask) closeDrinkModal(); });
 
-    function renderDrinkModal(drink, moodUsed, modeLabel){
+    function buildBearLine(moodUsed){
+      const moodLine = moodUsed ? pick(MOOD_BEAR[moodUsed] || ["🐻「我在。」"]) : "🐻「我在這裡，慢慢來。」";
+      const core = moodLine + "\n🐻「你願意把心事說一點點給我聽嗎？」";
+      return () => pick([core, ...BEAR_EXTRA_LINES]);
+    }
+
+    function renderDrinkModal(drink, moodUsed, modeLabel, historyTs){
       currentDrink = drink;
+      currentHistoryTs = historyTs ?? null;
 
       $("drinkTitle").textContent = modeLabel || "今晚的一杯";
       $("drinkEmoji").textContent = drink.emoji;
       $("drinkName").textContent = drink.name;
       $("drinkTag").textContent = drink.tag;
 
-      // 熊熊氣泡（一定出現）
-      const baseLine = moodUsed ? pick(MOOD_BEAR[moodUsed] || ["🐻「我在。」"]) : "🐻「我在這裡，慢慢來。」";
-      $("bearBubble").textContent = baseLine + "\n🐻「你願意把心事說一點點給我聽嗎？」";
+      bearLineFactory = buildBearLine(moodUsed);
+      $("bearBubble").textContent = bearLineFactory();
 
       $("drinkMoodLine").style.display = moodUsed ? "inline-block" : "none";
       if(moodUsed){
@@ -862,9 +958,52 @@
       $("drinkTrait").textContent = drink.trait;
       $("drinkWarn").textContent = drink.warn + "\n" + pick(GENERAL_WARN);
 
+      // memo 預填
+      const memoInput = $("memoInput");
+      memoInput.value = "";
+      if(historyTs){
+        const h = getHistory();
+        const row = h.find(x=>x.ts===historyTs);
+        if(row && row.memo) memoInput.value = row.memo;
+      }
+
       setFavButton();
       openDrinkModal();
     }
+
+    // ✅ 點熊熊氣泡換一句
+    $("bearBubble").addEventListener("click", ()=>{
+      if(!bearLineFactory){
+        $("bearBubble").textContent = pick(BEAR_EXTRA_LINES);
+        return;
+      }
+      $("bearBubble").textContent = bearLineFactory();
+      showToast("熊熊換一句陪你 🐻");
+    });
+
+    // ✅ 今晚我想記住：保存 memo（寫入 localStorage，顯示在歷史）
+    $("btnSaveMemo").addEventListener("click", ()=>{
+      const memo = ($("memoInput").value || "").trim();
+      if(!memo){ showToast("先寫一句再保存 📝"); return; }
+
+      if(!currentHistoryTs){
+        // 沒有對應紀錄就新增一筆
+        const ts = Date.now();
+        currentHistoryTs = ts;
+        addHistory({
+          ts,
+          mood: currentMood,
+          drinkId: currentDrink ? currentDrink.id : null,
+          via: "memoOnly",
+          memo
+        });
+        showToast("已保存到紀錄 📝");
+        return;
+      }
+
+      const ok = updateHistoryMemo(currentHistoryTs, memo);
+      showToast(ok ? "已保存到紀錄 📝" : "保存失敗（找不到紀錄）");
+    });
 
     // 收藏 / 複製
     $("btnFav").addEventListener("click", ()=>{
@@ -872,7 +1011,6 @@
       const on = toggleFav(currentDrink.id);
       setFavButton();
       showToast(on ? "已收藏 ⭐" : "已取消收藏");
-      // 若清單視窗開著，刷新
       if(listMask.classList.contains("show")) renderList();
     });
 
@@ -887,8 +1025,11 @@
     const listContent = $("listContent");
     const searchRow = $("searchRow");
     const searchInput = $("searchInput");
+    const filterRow = $("filterRow");
+    const filterBtns = Array.from(document.querySelectorAll(".filter-btn"));
 
     let listTab = "catalog"; // catalog / history / fav
+    let catFilter = "all";   // all/beer/red/white/spirit/cocktail/na
 
     function openListModal(tab){
       listTab = tab || "catalog";
@@ -897,9 +1038,7 @@
       renderList();
       if(listTab==="catalog") searchInput.focus();
     }
-    function closeListModal(){
-      listMask.classList.remove("show");
-    }
+    function closeListModal(){ listMask.classList.remove("show"); }
     $("listClose").addEventListener("click", closeListModal);
     listMask.addEventListener("click", (e)=>{ if(e.target===listMask) closeListModal(); });
 
@@ -907,10 +1046,14 @@
       $("tabCatalog").classList.toggle("active", listTab==="catalog");
       $("tabHistory").classList.toggle("active", listTab==="history");
       $("tabFav").classList.toggle("active", listTab==="fav");
+
       $("listTitle").textContent =
         listTab==="catalog" ? "📚 酒清單" :
         listTab==="history" ? "🕰️ 歷史紀錄" : "⭐ 收藏清單";
-      searchRow.style.display = (listTab==="catalog") ? "flex" : "none";
+
+      const showCatalog = (listTab==="catalog");
+      searchRow.style.display = showCatalog ? "flex" : "none";
+      filterRow.style.display = showCatalog ? "flex" : "none";
     }
 
     $("tabCatalog").addEventListener("click", ()=>{ listTab="catalog"; setTabs(); renderList(); });
@@ -920,17 +1063,31 @@
     $("btnSearchClear").addEventListener("click", ()=>{ searchInput.value=""; renderList(); });
     searchInput.addEventListener("input", ()=>renderList());
 
+    // ✅ 分類篩選
+    filterBtns.forEach(b=>{
+      b.addEventListener("click", ()=>{
+        catFilter = b.dataset.cat;
+        filterBtns.forEach(x=>x.classList.toggle("active", x.dataset.cat===catFilter));
+        renderList();
+      });
+    });
+
     function renderList(){
       listContent.innerHTML = "";
+
       if(listTab==="catalog"){
         const q = (searchInput.value || "").trim();
-        const pool = DRINKS.filter(d=>{
-          if(!q) return true;
-          return (d.name + " " + d.tag).includes(q);
-        });
+        let pool = DRINKS.slice();
+
+        if(catFilter !== "all"){
+          pool = pool.filter(d => d.cat === catFilter);
+        }
+        if(q){
+          pool = pool.filter(d => (d.name + " " + d.tag).includes(q));
+        }
 
         if(pool.length===0){
-          listContent.innerHTML = `<div class="smallnote">找不到「${q}」～換個關鍵字試試 🐻</div>`;
+          listContent.innerHTML = `<div class="smallnote">找不到符合條件的酒～換個分類或關鍵字試試 🐻</div>`;
           return;
         }
 
@@ -963,22 +1120,27 @@
           listContent.innerHTML = `<div class="smallnote">還沒有紀錄～先去選一杯 🐻🍷</div>`;
           return;
         }
-        h.slice(0,80).forEach(row=>{
-          const d = findDrink(row.drinkId);
-          if(!d) return;
+        h.slice(0,120).forEach(row=>{
+          const d = row.drinkId ? findDrink(row.drinkId) : null;
+          const title = d ? `${d.emoji} ${d.name}` : "📝 心情紀錄";
+          const subtitle = d ? d.tag : "你寫下的一句話";
+          const memoLine = row.memo ? `📝 ${row.memo}` : "";
+          const moodLine = `心情：${row.mood ?? "未選擇"}`;
+
           const div = document.createElement("div");
           div.className = "item";
           div.innerHTML = `
             <div class="item-top">
-              <div class="item-emoji">${d.emoji}</div>
+              <div class="item-emoji">${d ? d.emoji : "📝"}</div>
               <div style="flex:1">
-                <h5>${d.name}</h5>
-                <div class="meta">${formatTime(row.ts)}｜心情：${row.mood ?? "未選擇"}<br>${d.tag}</div>
+                <h5>${title}</h5>
+                <div class="meta">${formatTime(row.ts)}｜${moodLine}<br>${subtitle}${memoLine ? "<br>"+memoLine : ""}</div>
               </div>
             </div>
             <div class="item-actions">
-              <button class="btn small" data-action="openHistory" data-id="${d.id}" data-mood="${row.mood ?? ""}">打開</button>
-              <button class="btn small secondary" data-action="fav" data-id="${d.id}">${isFav(d.id) ? "取消收藏" : "收藏"}</button>
+              ${d ? `<button class="btn small" data-action="openHistory" data-id="${d.id}" data-ts="${row.ts}" data-mood="${row.mood ?? ""}">打開</button>` : ""}
+              ${d ? `<button class="btn small secondary" data-action="fav" data-id="${d.id}">${isFav(d.id) ? "取消收藏" : "收藏"}</button>` : ""}
+              <button class="btn small secondary" data-action="editMemo" data-ts="${row.ts}">編輯心情</button>
             </div>
           `;
           listContent.appendChild(div);
@@ -1018,12 +1180,11 @@
     listContent.addEventListener("click", async (e)=>{
       const btn = e.target.closest("button");
       if(!btn) return;
+
       const action = btn.dataset.action;
-      const id = Number(btn.dataset.id);
-      const d = findDrink(id);
-      if(!d) return;
 
       if(action==="fav"){
+        const id = Number(btn.dataset.id);
         toggleFav(id);
         renderList();
         if(currentDrink && currentDrink.id===id) setFavButton();
@@ -1032,17 +1193,38 @@
       }
 
       if(action==="open"){
+        const id = Number(btn.dataset.id);
+        const d = findDrink(id);
+        if(!d) return;
         await withLoading(()=>{
-          // 這是「學酒」：也給熊熊陪聊氣泡
-          renderDrinkModal(d, currentMood, "📚 酒清單・你選的酒");
-          addHistory({ts: Date.now(), mood: currentMood, drinkId: d.id, via:"catalog"});
+          const ts = Date.now();
+          addHistory({ts, mood: currentMood, drinkId: d.id, via:"catalog"});
+          renderDrinkModal(d, currentMood, "📚 酒清單・你選的酒", ts);
         });
         return;
       }
 
       if(action==="openHistory"){
+        const id = Number(btn.dataset.id);
+        const ts = Number(btn.dataset.ts);
         const mood = btn.dataset.mood || null;
-        await withLoading(()=>renderDrinkModal(d, mood || currentMood, "🕰️ 歷史回顧"));
+        const d = findDrink(id);
+        if(!d) return;
+        await withLoading(()=>renderDrinkModal(d, mood || currentMood, "🕰️ 歷史回顧", ts));
+        return;
+      }
+
+      if(action==="editMemo"){
+        const ts = Number(btn.dataset.ts);
+        const h = getHistory();
+        const row = h.find(x=>x.ts===ts);
+        const old = row?.memo || "";
+        const memo = prompt("今晚我想記住（最多 60 字）", old);
+        if(memo===null) return;
+        const v = (memo || "").trim().slice(0,60);
+        updateHistoryMemo(ts, v);
+        renderList();
+        showToast("已更新心情 📝");
         return;
       }
     });
@@ -1058,8 +1240,9 @@
       await withLoading(()=>{
         const pool = getPool();
         const chosen = pool.length ? pick(pool) : pick(DRINKS);
-        renderDrinkModal(chosen, currentMood, "🎲 隨機一杯");
-        addHistory({ts: Date.now(), mood: currentMood, drinkId: chosen.id, via:"random"});
+        const ts = Date.now();
+        addHistory({ts, mood: currentMood, drinkId: chosen.id, via:"random"});
+        renderDrinkModal(chosen, currentMood, "🎲 隨機一杯", ts);
         if(currentMood && pool.length===0) showToast("這個心情沒有對應酒款，改用全酒窖隨機 🐻");
       });
     });
@@ -1070,15 +1253,19 @@
 
     $("btnTalk").addEventListener("click", async ()=>{
       await withLoading(()=>{
-        // 用一個「陪聊模式」：不選酒也可以
-        const moodLine = currentMood ? pick(MOOD_BEAR[currentMood] || ["🐻「我在。」"]) : "🐻「我在這裡，慢慢來。」";
         currentDrink = null;
+        currentHistoryTs = null;
 
         $("drinkTitle").textContent = "💬 熊熊陪你說心事";
         $("drinkEmoji").textContent = "🐻";
         $("drinkName").textContent = "你不用解釋";
         $("drinkTag").textContent = "把今天說一點點，也很好";
-        $("bearBubble").textContent = moodLine + "\n🐻「你今天最想被怎麼對待？」";
+
+        bearLineFactory = () => pick([
+          (currentMood ? pick(MOOD_BEAR[currentMood]||["🐻「我在。」"]) : "🐻「我在這裡，慢慢來。」") + "\n🐻「你今天最想被怎麼對待？」",
+          ...BEAR_EXTRA_LINES
+        ]);
+        $("bearBubble").textContent = bearLineFactory();
 
         $("drinkMoodLine").style.display = currentMood ? "inline-block" : "none";
         if(currentMood) $("drinkMoodLine").textContent = `你選的心情：${currentMood}`;
@@ -1089,7 +1276,8 @@
         $("drinkTrait").textContent = "陪伴、傾聽、慢慢來。";
         $("drinkWarn").textContent = pick(GENERAL_WARN);
 
-        $("btnFav").textContent = "⭐ 收藏"; // 陪聊不收藏
+        $("memoInput").value = "";
+        $("btnFav").textContent = "⭐ 收藏";
         openDrinkModal();
       });
     });
@@ -1097,17 +1285,27 @@
     $("btnWarn").addEventListener("click", async ()=>{
       await withLoading(()=>{
         currentDrink = null;
+        currentHistoryTs = null;
+
         $("drinkTitle").textContent = "⚠️ 微醺提醒";
         $("drinkEmoji").textContent = "⚠️";
         $("drinkName").textContent = "溫柔但重要";
         $("drinkTag").textContent = "我希望你開心，也希望你安全";
-        $("bearBubble").textContent = "🐻「我不反對你放鬆，但我更在意你平安。」\n🐻「今晚我們以『剛剛好』為目標。」";
+
+        bearLineFactory = () => pick([
+          "🐻「我不反對你放鬆，但我更在意你平安。」\n🐻「今晚我們以『剛剛好』為目標。」",
+          ...BEAR_EXTRA_LINES
+        ]);
+        $("bearBubble").textContent = bearLineFactory();
+
         $("drinkMoodLine").style.display = "none";
         $("drinkFollow").textContent = "🐻「你願意先照顧好身體，其他明天再說嗎？」";
         $("drinkStory").textContent = "微醺不是麻痺，也不是逞強。\n是剛剛好地對自己溫柔。";
         $("drinkFlavor").textContent = "（提醒頁沒有風味描述）";
         $("drinkTrait").textContent = "安全第一、慢慢喝、慢慢回家。";
         $("drinkWarn").textContent = GENERAL_WARN.join("\n");
+
+        $("memoInput").value = "";
         $("btnFav").textContent = "⭐ 收藏";
         openDrinkModal();
       });
