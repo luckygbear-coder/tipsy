@@ -10,27 +10,27 @@
   --pink1:#ffd1f0;
   --pink2:#ffe6fa;
   --mask:rgba(0,0,0,.35);
-  --dockH: 124px;
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
+
 body{
   margin:0;
   background:var(--bg);
   font-family:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:var(--text);
-  overflow:hidden;
+  overflow:auto; /* ✅ 不要鎖死，不然 iPhone 很容易怪 */
 }
 
 .app{
-  min-height: 100dvh;
+  min-height:100dvh;
   display:flex;
   flex-direction:column;
-  padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom));
 }
 
 .header{padding:14px 14px 10px;}
+
 .topbar{
   display:flex; gap:12px; align-items:center;
   padding:14px; border:2px solid var(--border);
@@ -48,126 +48,120 @@ body{
 .title h1{margin:0;font-size:18px;letter-spacing:.4px}
 .title p{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.35}
 
+/* ✅ 主內容 */
 .main{
   flex:1;
   min-height:0;
   overflow:auto;
   -webkit-overflow-scrolling: touch;
-  padding:0 14px 10px;
+  padding:0 14px 18px;
   display:flex;
   flex-direction:column;
   gap:12px;
 }
 
-.hero{
-  border-radius:20px;
+/* ====== 最上方 IG 主題按鈕 ====== */
+.top-ig-btn{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px;
+  border-radius:18px;
+  background:#fff7e6;
+  border:2px solid var(--border);
+  box-shadow:0 8px 18px rgba(0,0,0,0.10);
+  text-decoration:none;
+  color:var(--text);
+}
+.top-ig-icon{
+  width:46px; height:46px; border-radius:12px; object-fit:cover;
+  border:2px solid rgba(225,182,118,.7);
+  background:#fff;
+}
+.top-ig-text{ flex:1; min-width:0; }
+.top-ig-title{ font-weight:900; font-size:16px; letter-spacing:.5px; }
+.top-ig-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+.top-ig-arrow{ font-size:22px; opacity:.55; }
+
+/* ====== 熊主視覺（新版） ====== */
+.hero-card{ margin-top:4px; }
+
+.hero-media{
+  position:relative;
+  border-radius:22px;
   overflow:hidden;
   border:2px solid var(--border);
   box-shadow:0 10px 24px var(--shadow);
   background:#fff;
-  position:relative;
-  min-height:260px;
+  min-height:260px; /* ✅ 圖片還沒載入也不會塌 */
   cursor:pointer;
   user-select:none;
   -webkit-touch-callout:none;
 }
-.hero, .hero *{
-  -webkit-user-select:none;
-  user-select:none;
-}
-.hero img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  pointer-events:none;
+
+.hero-img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:cover;
   -webkit-user-drag:none;
 }
-.hero:active{
-  transform: translateY(1px) scale(.995);
-  filter: brightness(.99);
-  transition: transform .08s ease, filter .15s ease;
-}
 
-.badge{
-  position:absolute; left:10px; top:10px;
-  background:rgba(255,247,230,.92);
-  border:2px solid var(--border);
-  padding:8px 10px; border-radius:999px;
-  font-size:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.10);
-}
-
-/* ✅ 漫畫氣泡：放左下，尾巴朝右（指向熊） */
-.comic-bubble{
+/* ✅ 氣泡在熊頭上 */
+.comic-bubble.over-bear{
   position:absolute;
-  left:12px;
-  right:92px;          /* ✅ 右邊留空給提示＋讓尾巴更像指向熊 */
-  bottom:12px;
+  left:14px;
+  right:14px;
+  top:14px;
+  z-index:5;
 
-  background:rgba(255,255,255,.92);
+  background:#fff;
   border:2px solid var(--border);
   border-radius:16px;
   padding:10px 12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
+  box-shadow:0 8px 18px rgba(0,0,0,0.18);
 
-  font-size:13px;
-  line-height:1.55;
+  font-size:14px;
+  line-height:1.45;
   white-space:pre-wrap;
-  backdrop-filter: blur(2px);
-  z-index:2;
 }
 
-/* ✅ 尾巴：在右側，指向熊（像你第二張圖） */
-.comic-bubble:before{
+/* ✅ 氣泡尾巴：往下指熊 */
+.comic-bubble.over-bear::before{
   content:"";
   position:absolute;
-  right:-8px;          /* ✅ 尾巴在右邊 */
-  bottom:18px;
-  width:14px;
-  height:14px;
-  background:rgba(255,255,255,.92);
-  border-right:2px solid var(--border);
-  border-bottom:2px solid var(--border);
-  transform:rotate(-45deg);
+  left:28px;
+  bottom:-10px;
+  width:0;height:0;
+  border-left:10px solid transparent;
+  border-right:10px solid transparent;
+  border-top:10px solid var(--border);
 }
-
-  background:rgba(255,255,255,.92);
-  border:2px solid var(--border);
-  border-radius:16px;
-  padding:10px 12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-
-  font-size:13px;
-  line-height:1.55;
-  white-space:pre-wrap;
-  backdrop-filter: blur(2px);
-}
-.comic-bubble:before{
+.comic-bubble.over-bear::after{
   content:"";
   position:absolute;
-  left:18px;
+  left:28px;
   bottom:-8px;
-  width:14px;height:14px;
-  background:rgba(255,255,255,.92);
-  border-left:2px solid var(--border);
-  border-bottom:2px solid var(--border);
-  transform:rotate(-45deg);
+  width:0;height:0;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:9px solid #fff;
 }
 
-.tapHint{
+/* ✅ 右下角提示 */
+.hero-hint{
   position:absolute;
   right:12px;
-  bottom:12px;        /* ✅ 改到右下角 */
-  top:auto;           /* ✅ 取消 top */
-  background:rgba(255,247,230,.92);
-  border:2px dashed var(--border);
-  padding:8px 10px;
-  border-radius:999px;
+  bottom:12px;
+  z-index:6;
+  background:rgba(255,255,255,.86);
+  border:1px dashed rgba(225,182,118,.9);
+  padding:6px 10px;
+  border-radius:14px;
   font-size:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-  z-index:3;
+  color:#6a4b5a;
 }
 
+/* ====== 按鈕 ====== */
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
 .btn{
   appearance:none; border:none; cursor:pointer;
   background:linear-gradient(180deg,var(--btn),var(--btn2));
@@ -184,15 +178,10 @@ body{
 }
 .btn:active{transform:translateY(1px) scale(.99)}
 .btn.secondary{background:#fff;}
-.btn.ig{background:linear-gradient(180deg,var(--pink1),var(--pink2));}
 .btn.small{padding:10px 10px; font-size:13px; border-radius:14px;}
 
-.moodWrap{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  justify-content:space-between;
-}
+/* ====== 心情 ====== */
+.moodWrap{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
 .moods{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 .mood-btn{
   border:none; cursor:pointer;
@@ -211,27 +200,11 @@ body{
   background:#fff; border:1px dashed var(--border);
   padding:6px 10px;border-radius:999px;
   white-space:nowrap;
-  align-self:flex-start;
 }
 
-/* Dock */
-.dock{
-  position:fixed; left:0; right:0; bottom:0;
-  z-index:70;
-  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(255,247,230,.95);
-  border-top:2px solid var(--border);
-  box-shadow:0 -10px 24px rgba(0,0,0,.08);
-}
-.dock-inner{
-  max-width:480px;margin:0 auto;
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
-}
-.dock-inner.single{grid-template-columns:1fr; margin-top:10px;}
-
-/* Toast */
+/* ====== Toast ====== */
 .toast{
-  position:fixed; left:50%; bottom:calc(var(--dockH) + 14px);
+  position:fixed; left:50%; bottom:14px;
   transform:translateX(-50%);
   background:rgba(75,48,68,.92);
   color:#fff;
@@ -246,15 +219,15 @@ body{
 }
 .toast.show{opacity:1}
 
-/* Modal */
+/* ====== Modal ====== */
 .modal-mask{
   position:fixed; inset:0;
   background:var(--mask);
   display:none;
   align-items:flex-end;
-  z-index:80;
 }
 .modal-mask.show{display:flex;}
+
 .modal{
   width:100%;
   max-width:480px;
@@ -268,6 +241,7 @@ body{
   max-height: 88dvh;
   overflow:hidden;
 }
+
 .modal-head{
   display:flex; align-items:center; justify-content:space-between; gap:10px;
   margin-bottom:10px;
@@ -282,25 +256,6 @@ body{
   font-size:13px;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
   user-select:none;
-}
-
-.drink-head{display:flex; gap:10px; align-items:flex-start; margin-top:4px;}
-.emoji{
-  width:44px;height:44px;border-radius:14px;
-  border:2px solid var(--border);
-  background:#fff7e6;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;flex:0 0 auto;
-}
-.drink-meta{flex:1}
-.drink-meta h4{margin:0;font-size:16px}
-.tag{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.4}
-.pillline{
-  margin-top:6px;
-  font-size:12px;color:var(--muted);
-  background:#fff;border:1px dashed var(--border);
-  padding:6px 10px;border-radius:999px;
-  display:inline-block;
 }
 
 .content{
@@ -324,17 +279,15 @@ body{
 }
 .warn{background:#fff1f1;border:1px solid rgba(176,71,71,.35);color:#6a2b2b;}
 
-.memo-wrap{display:flex; gap:8px; align-items:center; margin-top:6px;}
-.memo-wrap input{
-  flex:1;
-  border:2px solid rgba(225,182,118,.7);
-  border-radius:14px;
-  padding:10px 12px;
-  font-size:16px;
-  outline:none;
-  background:#fff;
+.smallnote{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
 }
 
+/* Tabs / filters / list */
 .tabs{display:flex; gap:8px; margin:10px 0;}
 .tab{
   flex:1;
@@ -345,7 +298,6 @@ body{
   padding:9px 10px;
   font-size:13px;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  user-select:none;
 }
 .tab.active{background:linear-gradient(180deg,#fff0c8,#fff7e6);}
 
@@ -358,7 +310,6 @@ body{
   padding:7px 10px;
   font-size:12px;
   box-shadow:0 3px 8px rgba(0,0,0,.07);
-  user-select:none;
 }
 .filter-btn.active{background:linear-gradient(180deg,#fff0c8,#fff7e6);}
 
@@ -386,61 +337,71 @@ body{
   border:2px solid var(--border);
   background:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px; flex:0 0 auto;
+  font-size:20px;
 }
 .item h5{margin:0;font-size:14px}
 .item .meta{margin-top:4px;font-size:12px;color:var(--muted);line-height:1.35}
 .item-actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
-.smallnote{
-  margin-top:10px;
-  color:var(--muted);
+
+/* ====== 派對小遊戲 ====== */
+.party-wrap{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 8px 18px rgba(0,0,0,.10);
+  padding:12px;
+}
+.party-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.party-note{margin-top:8px;font-size:12px;color:var(--muted);text-align:center;line-height:1.4;}
+.party-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+.party-task{ margin-top:10px; }
+.party-type{
+  display:inline-block;
   font-size:12px;
-  line-height:1.5;
-  text-align:center;
-}
-/* 🐻 漫畫對話框：在熊上方，像熊在說話 */
-.comic-bubble{
-  position:absolute;
-  left:16px;
-  right:16px;
-  bottom:92px;              /* ⬅️ 在熊圖片上方 */
-  background:#fff;
-  border:2px solid var(--border);
-  border-radius:16px;
-  padding:10px 12px;
-  font-size:13px;
-  line-height:1.55;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-  z-index:3;
-}
-
-/* 尾巴：往下指熊 */
-.comic-bubble::after{
-  content:"";
-  position:absolute;
-  left:48px;                /* ⬅️ 對齊熊臉偏左 */
-  bottom:-8px;
-  width:14px;
-  height:14px;
-  background:#fff;
-  border-left:2px solid var(--border);
-  border-bottom:2px solid var(--border);
-  transform:rotate(-45deg);
-}
-
-/* 🍇 微醺酒窖：移到最下面，像資訊標籤 */
-.badge{
-  position:absolute;
-  left:12px;
-  bottom:12px;              /* ⬅️ 跑到最下面 */
-  top:auto;
-  background:rgba(255,247,230,.95);
-  border:2px solid var(--border);
+  color:var(--muted);
+  border:1px dashed var(--border);
   border-radius:999px;
   padding:6px 10px;
-  font-size:12px;
-  z-index:2;
+  background:#fff;
 }
+.party-card{
+  margin-top:10px;
+  background:#fff7e6;
+  border:2px solid rgba(225,182,118,.65);
+  border-radius:16px;
+  padding:14px 12px;
+  font-size:15px;
+  line-height:1.6;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+  white-space:pre-wrap;
+}
+.party-toggle{
+  margin-top:10px;
+  background:#fff;
+  border:1px dashed var(--border);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.toggle{display:flex;align-items:center;gap:10px;user-select:none;cursor:pointer;}
+.toggle input{display:none;}
+.toggle-ui{
+  width:44px;height:26px;border-radius:999px;
+  border:2px solid rgba(225,182,118,.8);
+  background:#fff7e6;
+  position:relative;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.toggle-ui:after{
+  content:"";
+  position:absolute; top:2px; left:2px;
+  width:20px;height:20px;border-radius:999px;
+  background:#fff;
+  border:2px solid rgba(225,182,118,.8);
+  transition:transform .18s ease;
+}
+.toggle input:checked + .toggle-ui:after{transform:translateX(18px);}
+.toggle-text{font-size:13px;color:var(--text);line-height:1.3;}
 
 /* Loading */
 .loading{
@@ -470,197 +431,17 @@ body{
   background:#fff;
   animation:bob 1.1s ease-in-out infinite;
 }
-/* 🎉 派對小遊戲區塊 */
-.party-wrap{
-  background:var(--card);
-  border:2px solid var(--border);
-  border-radius:18px;
-  box-shadow:0 8px 18px rgba(0,0,0,.10);
-  padding:12px;
-}
-.party-title{
-  font-size:14px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-.party-note{
-  margin-top:8px;
-  font-size:12px;
-  color:var(--muted);
-  text-align:center;
-  line-height:1.4;
-}
-
-/* 派對跳窗內容 */
-#partyMask{ z-index: 88; } /* ✅ 讓它一定在最上層 */
-.party-task{ margin-top:10px; }
-.party-type{
-  display:inline-block;
-  font-size:12px;
-  color:var(--muted);
-  border:1px dashed var(--border);
-  border-radius:999px;
-  padding:6px 10px;
-  background:#fff;
-}
-.party-card{
-  margin-top:10px;
-  background:#fff7e6;
-  border:2px solid rgba(225,182,118,.65);
-  border-radius:16px;
-  padding:14px 12px;
-  font-size:15px;
-  line-height:1.6;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-  white-space:pre-wrap;
-}
-/* 派對三按鈕 */
-.party-grid3{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-}
-
-/* 酒精模式開關 */
-.party-toggle{
-  margin-top:10px;
-  background:#fff;
-  border:1px dashed var(--border);
-  border-radius:14px;
-  padding:10px 12px;
-}
-
-.toggle{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  user-select:none;
-  cursor:pointer;
-}
-
-.toggle input{ display:none; }
-
-.toggle-ui{
-  width:44px;
-  height:26px;
-  border-radius:999px;
-  border:2px solid rgba(225,182,118,.8);
-  background:#fff7e6;
-  position:relative;
-  flex:0 0 auto;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
-}
-
-.toggle-ui:after{
-  content:"";
-  position:absolute;
-  top:2px; left:2px;
-  width:20px; height:20px;
-  border-radius:999px;
-  background:#fff;
-  border:2px solid rgba(225,182,118,.8);
-  transition:transform .18s ease;
-}
-
-.toggle input:checked + .toggle-ui:after{
-  transform:translateX(18px);
-}
-
-.toggle-text{
-  font-size:13px;
-  color:var(--text);
-  line-height:1.3;
-}
-/* ====== 最上方 IG 主題按鈕 ====== */
-.top-ig-btn{
-  display:flex; align-items:center; gap:12px;
-  padding:12px 14px;
-  border-radius:18px;
-  background:#fff7e6;
-  border:2px solid #e1b676;
-  box-shadow:0 3px 8px rgba(0,0,0,0.12);
-  text-decoration:none;
-  color:#4b3044;
-}
-.top-ig-icon{
-  width:46px; height:46px; border-radius:12px; object-fit:cover;
-  border:2px solid #f5d3a6;
-}
-.top-ig-text{ flex:1; min-width:0; }
-.top-ig-title{ font-weight:900; font-size:16px; letter-spacing:.5px; }
-.top-ig-sub{ font-size:12px; opacity:.85; margin-top:2px; }
-.top-ig-arrow{ font-size:22px; opacity:.6; }
-
-/* ====== 熊圖片區：氣泡在熊頭上 ====== */
-.hero-card{ margin-top:12px; }
-.hero-media{ position:relative; border-radius:22px; overflow:hidden; }
-.hero-img{ width:100%; display:block; border-radius:22px; }
-
-/* 氣泡（在圖上方） */
-.comic-bubble.over-bear{
-  position:absolute;
-  left:14px;
-  right:14px;
-  top:14px;
-  z-index:5;
-
-  background:#fff;
-  border:2px solid #e1b676;
-  border-radius:16px;
-  padding:10px 12px;
-  box-shadow:0 8px 18px rgba(0,0,0,0.18);
-
-  font-size:14px;
-  line-height:1.45;
-}
-
-/* 氣泡尾巴：指向熊的頭（往下） */
-.comic-bubble.over-bear::after{
-  content:"";
-  position:absolute;
-  left:28px;
-  bottom:-10px;
-  width:0; height:0;
-  border-left:10px solid transparent;
-  border-right:10px solid transparent;
-  border-top:10px solid #e1b676;
-}
-.comic-bubble.over-bear::before{
-  content:"";
-  position:absolute;
-  left:28px;
-  bottom:-8px;
-  width:0; height:0;
-  border-left:9px solid transparent;
-  border-right:9px solid transparent;
-  border-top:9px solid #fff;
-}
-
-/* 右下角提示 */
-.hero-hint{
-  position:absolute;
-  right:12px;
-  bottom:12px;
-  z-index:6;
-  background:rgba(255,255,255,.85);
-  border:1px dashed #e1b676;
-  padding:6px 10px;
-  border-radius:14px;
-  font-size:12px;
-  color:#6a4b5a;
-}
 .load-bear img{width:100%;height:100%;object-fit:cover}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.load-text{font-size:14px;line-height:1.5;}
-.load-sub{color:var(--muted);font-size:12px;}
 .dots{display:flex; gap:6px; justify-content:center; margin-top:10px;}
 .dot{width:8px;height:8px;border-radius:999px;background:rgba(75,48,68,.7);animation:blink 1s infinite ease-in-out;}
 .dot:nth-child(2){animation-delay:.15s}
 .dot:nth-child(3){animation-delay:.3s}
 @keyframes blink{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px);opacity:1}}
 
-/* ✅ 疊層保險 */
+/* ✅ 疊層保險（視窗不會被蓋住） */
 #listMask{ z-index:80; }
 #drinkMask{ z-index:90; }
-#toast{ z-index:92; }
-#loading{ z-index:95; }
+#partyMask{ z-index:96; }
+#toast{ z-index:97; }
+#loading{ z-index:98; }
