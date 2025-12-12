@@ -1355,7 +1355,84 @@
     setBearImages();
     $("todayLine").textContent = pick(TODAY_LINES);
     $("countBadge").textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;
+// ===== 主畫面點熊熊：純聊天 30 句（不影響酒介紹/歷史/收藏） =====
+const BEAR_CHAT_30 = [
+  "🐻「你來了就好，我在。」",
+  "🐻「今天的你辛苦了。」",
+  "🐻「不用把自己逼太緊，真的。」",
+  "🐻「你不用表現得很堅強。」",
+  "🐻「你願意說一點點就好。」",
+  "🐻「如果你想哭，也沒關係。」",
+  "🐻「你不是一個人。」",
+  "🐻「我可以陪你把今天收起來。」",
+  "🐻「先深呼吸一下，好嗎？」",
+  "🐻「你做得比你想的還多。」",
+  "🐻「我想抱抱你（如果你願意）。」",
+  "🐻「你可以慢慢來，沒人催你。」",
+  "🐻「你不需要立刻好起來。」",
+  "🐻「你的感受很重要。」",
+  "🐻「我在聽，你說。」",
+  "🐻「今天最累的是哪裡？」",
+  "🐻「你最想被理解的是什麼？」",
+  "🐻「你願意對自己溫柔一點嗎？」",
+  "🐻「你已經很努力了，真的。」",
+  "🐻「如果可以放下 1%，你想放下什麼？」",
+  "🐻「你值得被好好對待。」",
+  "🐻「不用急著給答案。」",
+  "🐻「你可以先休息，再決定。」",
+  "🐻「今晚只做一件事：照顧你。」",
+  "🐻「你想要陪伴，還是想要方向？」",
+  "🐻「你願意把心事說給我聽嗎？」",
+  "🐻「我不評價你，我只陪你。」",
+  "🐻「你今天有一點點快樂嗎？」",
+  "🐻「明天的事，明天再說。」",
+  "🐻「你願意原諒自己一次嗎？」"
+];
 
+const bearChatMask = document.getElementById("bearChatMask");
+const bearChatBubble = document.getElementById("bearChatBubble");
+const bearChatClose = document.getElementById("bearChatClose");
+const btnCopyChat = document.getElementById("btnCopyChat");
+const btnCloseChat2 = document.getElementById("btnCloseChat2");
+const heroTap = document.getElementById("heroTap");
+const bearAvatarChat = document.getElementById("bearAvatarChat");
+
+function openBearChat(){
+  if(bearChatBubble) bearChatBubble.textContent = pick(BEAR_CHAT_30);
+  if(bearChatMask) bearChatMask.classList.add("show");
+}
+function closeBearChat(){
+  if(bearChatMask) bearChatMask.classList.remove("show");
+}
+
+// ✅ 讓聊天跳窗也用同一張熊熊圖（沿用你現有 setBearImages 的容錯路徑）
+(function syncChatAvatar(){
+  if(!bearAvatarChat) return;
+  // 先用第一個路徑，若你 setBearImages 已切換，這裡也會跟著顯示
+  bearAvatarChat.src = IMG_TRY[0];
+  bearAvatarChat.onerror = ()=>{ bearAvatarChat.src = IMG_TRY[1]; };
+})();
+
+// 主畫面點熊熊 → 開聊天
+if(heroTap) heroTap.addEventListener("click", openBearChat);
+
+// 點氣泡換一句
+if(bearChatBubble) bearChatBubble.addEventListener("click", ()=>{
+  bearChatBubble.textContent = pick(BEAR_CHAT_30);
+  showToast("熊熊換一句陪你 🐻");
+});
+
+// 關閉
+if(bearChatClose) bearChatClose.addEventListener("click", closeBearChat);
+if(btnCloseChat2) btnCloseChat2.addEventListener("click", closeBearChat);
+if(bearChatMask) bearChatMask.addEventListener("click", (e)=>{ if(e.target===bearChatMask) closeBearChat(); });
+
+// 複製
+if(btnCopyChat) btnCopyChat.addEventListener("click", ()=>{
+  const t = (bearChatBubble?.textContent || "").trim();
+  navigator.clipboard?.writeText(t);
+  showToast("已複製 🐻");
+});
     // ========= PWA：安裝 =========
     let deferredPrompt = null;
     const installBtn = $("btnInstall");
