@@ -324,15 +324,23 @@ let currentMood = null;
 let currentDrink = null;
 let currentHistoryTs = null;
 
+function clampText(s, n=42){
+  s = (s||"").trim();
+  return s.length > n ? s.slice(0, n) + "…" : s;
+}
+
 // ========= 漫畫氣泡（主畫面） =========
 function refreshComicBubble(){
   const b = $("comicBubble");
   if(!b) return;
-  if(currentMood){
-    b.textContent = pick(MOOD_3[currentMood] || BEAR_CHAT_30);
-  }else{
-    b.textContent = pick(BEAR_CHAT_30);
-  }
+
+  const t = currentMood
+    ? pick(MOOD_3[currentMood] || BEAR_CHAT_30)
+    : pick(BEAR_CHAT_30);
+
+  // ✅ 控制長度，避免把熊遮住
+  b.textContent = clampText(t, 42);
+}
 }
 
 function getPool(){
