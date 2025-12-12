@@ -17,31 +17,31 @@
 <body>
   <div class="app">
     <header class="header">
-      <!-- ✅ 最上方主題：改成 IG 連結按鈕（注意：一定要在 body 裡） -->
+      <!-- ✅ 最上方主題：IG 連結按鈕 -->
       <a id="btnIGTop" class="top-ig-btn" href="https://instagram.com/luckygbear" target="_blank" rel="noopener">
-        <img class="top-ig-icon" src="images/tipsy-bear.png" alt="微醺熊" />
+        <!-- ✅ 加上 id，讓 app.js 容錯路徑可以套到這張 -->
+        <img id="bearIconTop" class="top-ig-icon" src="images/tipsy-bear.png" alt="微醺熊" />
         <div class="top-ig-text">
           <div class="top-ig-title">找微醺熊聊心事 🐻🍷</div>
           <div class="top-ig-sub">點我去 IG，跟熊熊聊聊</div>
         </div>
         <div class="top-ig-arrow">›</div>
       </a>
-
- 
     </header>
 
     <main class="main">
-      <!-- ✅ 熊主視覺卡片：圖片 + 氣泡（在熊頭上） -->
+      <!-- （可選）顯示收錄數徽章：app.js 會自動寫入文字 -->
+      <div class="badge" id="countBadge" aria-hidden="true"></div>
+
+      <!-- ✅ 熊主視覺卡片：圖片 + 氣泡 -->
       <div class="hero-card" id="heroTap">
         <div class="hero-media">
           <img id="bearHeroImg" class="hero-img" src="images/tipsy-bear.png" alt="tipsy bear" />
 
-          <!-- ✅ 氣泡在熊頭上 -->
           <div id="comicBubble" class="comic-bubble over-bear" tabindex="0" role="button" aria-label="點一下換一句">
             🐻「你來了就好，我在。」
           </div>
 
-          <!-- ✅ 右下角提示 -->
           <div class="hero-hint">☝️ 點熊熊或氣泡換一句</div>
         </div>
       </div>
@@ -75,7 +75,7 @@
         <div class="mood-pill" id="moodPill">未選擇</div>
       </section>
 
-      <!-- ✅ 只留安裝（你原本多出來的 </nav> 我已移除） -->
+      <!-- ✅ 安裝 -->
       <div class="dock-inner single">
         <button class="btn small" id="btnInstall" style="display:none;">📲 加到主畫面</button>
       </div>
