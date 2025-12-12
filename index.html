@@ -189,5 +189,34 @@
   <div class="toast" id="toast">已複製</div>
 
   <script src="app.js"></script>
+  <!-- ✅ Modal：派對小遊戲 -->
+<div class="modal-mask" id="partyMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="partyTitle">🎉 派對小遊戲</h3>
+      <button class="xbtn" id="partyClose">關閉 ✕</button>
+    </div>
+
+    <div class="chat-row">
+      <div class="avatar"><img id="partyAvatar" alt="微醺熊"></div>
+      <div style="flex:1">
+        <div class="bubble" id="partyBearLine" title="點我換一句 🐻">🐻「玩輕鬆的就好，不想做就換題！」</div>
+        <div class="bubble-tip">（點熊熊話語可以換一句）</div>
+      </div>
+    </div>
+
+    <div class="party-task">
+      <div class="party-type" id="partyType">—</div>
+      <div class="party-card" id="partyTask">—</div>
+    </div>
+
+    <div class="row2" style="margin-top:10px;">
+      <button class="btn small" id="partyNext">🔄 下一題</button>
+      <button class="btn small secondary" id="partyCopy">📋 複製題目</button>
+    </div>
+
+    <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車｜不喝也能玩得很開心</div>
+  </div>
+</div>
 </body>
 </html>
