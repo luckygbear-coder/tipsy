@@ -95,12 +95,39 @@ body{
   box-shadow:0 6px 14px rgba(0,0,0,.10);
 }
 
-/* ✅ 漫畫氣泡（固定在熊圖上） */
+/* ✅ 漫畫氣泡：放左下，尾巴朝右（指向熊） */
 .comic-bubble{
   position:absolute;
   left:12px;
-  right:12px;
+  right:92px;          /* ✅ 右邊留空給提示＋讓尾巴更像指向熊 */
   bottom:12px;
+
+  background:rgba(255,255,255,.92);
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+
+  font-size:13px;
+  line-height:1.55;
+  white-space:pre-wrap;
+  backdrop-filter: blur(2px);
+  z-index:2;
+}
+
+/* ✅ 尾巴：在右側，指向熊（像你第二張圖） */
+.comic-bubble:before{
+  content:"";
+  position:absolute;
+  right:-8px;          /* ✅ 尾巴在右邊 */
+  bottom:18px;
+  width:14px;
+  height:14px;
+  background:rgba(255,255,255,.92);
+  border-right:2px solid var(--border);
+  border-bottom:2px solid var(--border);
+  transform:rotate(-45deg);
+}
 
   background:rgba(255,255,255,.92);
   border:2px solid var(--border);
