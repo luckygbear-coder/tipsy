@@ -1,13 +1,14 @@
 // ========= 圖片路徑容錯（Images/ 或 images/ 都可） =========
 const IMG_TRY = ["Images/tipsy-bear.png", "images/tipsy-bear.png"];
 function setBearImages(){
-  const targets = ["bearIconTop","bearHeroImg","loadBear"];
+  const targets = ["bearIconTop","bearHeroImg","loadBear","partyAvatar"];
   let idx = 0;
   const apply = () => targets.forEach(id => {
     const el = document.getElementById(id);
     if(el) el.src = IMG_TRY[idx];
   });
   apply();
+
   const hero = document.getElementById("bearHeroImg");
   if(hero){
     hero.onerror = () => { idx = Math.min(idx+1, IMG_TRY.length-1); apply(); };
@@ -24,6 +25,7 @@ const toast = $("toast");
 const loading = $("loading");
 
 function showToast(msg){
+  if(!toast) return;
   toast.textContent = msg;
   toast.classList.add("show");
   clearTimeout(showToast._t);
@@ -68,6 +70,7 @@ function formatTime(ts){
 }
 
 async function withLoading(fn){
+  if(!loading) return Promise.resolve().then(fn);
   loading.classList.add("show");
   const minDelay = new Promise(res=>setTimeout(res, 750));
   const run = Promise.resolve().then(fn);
@@ -143,7 +146,7 @@ const BEAR_CHAT_30 = [
   "🐻「你願意原諒自己一次嗎？」"
 ];
 
-// ========= 酒資料（沿用你原本 33 杯，只是「顯示」分類變少） =========
+// ========= 酒資料（你的 33 杯） =========
 // cat: beer / red / white / spirit / cocktail / na
 const DRINKS = [
   {id:1, cat:"beer", emoji:"🍺", name:"拉格（Lager）", tag:"清爽・順口・日常小確幸", moods:["放鬆","想聊聊"],
@@ -176,7 +179,6 @@ const DRINKS = [
     flavor:"可可/咖啡烘焙香，尾韻厚實。",
     warn:"口感濃別猛灌；配甜點/鹹食都很棒。",
     followUps:["今晚你最需要安慰還是肯定？","你願意允許自己慢下來嗎？"]},
-
   {id:7, cat:"red", emoji:"🍷", name:"卡本內蘇維濃", tag:"成熟有力・結構感紅酒", moods:["想聊聊","想慶祝"],
     story:"像一位有肩膀的大人：你可以靠一下，然後想起你其實也很強。",
     flavor:"黑醋栗＋木質感，單寧較明顯。",
@@ -187,7 +189,6 @@ const DRINKS = [
     flavor:"紅莓/李子香氣，口感柔順。",
     warn:"甜柔容易喝多；慢慢來。",
     followUps:["你希望有人對你說『你很好』嗎？","你最想被稱讚的一件事是？"]},
-
   {id:9, cat:"white", emoji:"🥂", name:"夏多內（Chardonnay）", tag:"白酒經典・柔光質地", moods:["想慶祝","放鬆"],
     story:"像把日子調成柔光：舒服不刺眼，讓你願意對自己更好。",
     flavor:"蘋果/柑橘；部分帶奶油或烤麵包感。",
@@ -208,7 +209,6 @@ const DRINKS = [
     flavor:"清脆氣泡＋果香，收口俐落。",
     warn:"氣泡會加速吸收，慢慢喝。",
     followUps:["你想為哪件小事乾杯？","今天最亮的瞬間是？"]},
-
   {id:13, cat:"spirit", emoji:"🥃", name:"威士忌（Whisky）", tag:"深沉木質・慢慢聊", moods:["想聊聊","放鬆"],
     story:"像深夜對話：不急著結論，只陪你把真心說完。",
     flavor:"木質＋香草＋焦糖（依桶陳）。",
@@ -239,7 +239,6 @@ const DRINKS = [
     flavor:"植物香＋胡椒感，收口乾爽。",
     warn:"別連續 shot；慢喝最安全。",
     followUps:["你願意勇敢一次會選哪件事？","你想把熱情放回哪裡？"]},
-
   {id:19, cat:"cocktail", emoji:"🍸", name:"莫希托（Mojito）", tag:"薄荷清爽・透氣自由", moods:["放鬆","想慶祝"],
     story:"像把心裡的悶打開一條縫：讓你呼吸到自由。",
     flavor:"薄荷＋萊姆清酸＋氣泡清爽。",
@@ -285,7 +284,6 @@ const DRINKS = [
     flavor:"多基酒混合＋柑橘與可樂感，酒感隱藏。",
     warn:"濃度高！務必慢喝；喝酒不開車。",
     followUps:["你有哪件事其實撐很久？","你願意讓自己不用假裝嗎？"]},
-
   {id:28, cat:"spirit", emoji:"🍶", name:"清酒（日本酒）", tag:"米香柔和・安靜陪伴", moods:["放鬆","想聊聊"],
     story:"像靜靜點燈：不吵，但讓你覺得有人在。",
     flavor:"米香＋柔和甜旨，尾韻乾淨（依風格）。",
@@ -306,7 +304,6 @@ const DRINKS = [
     flavor:"辛香＋穀物香，酒感直接。",
     warn:"濃度高！小口即可，避免連續杯。",
     followUps:["你最想說的真話是什麼？","你想把哪個糾結斷開？"]},
-
   {id:32, cat:"na", emoji:"🫧", name:"無酒精調酒（Mocktail）", tag:"不喝也很酷・享受氛圍", moods:["放鬆","想聊聊","想慶祝"],
     story:"你不需要酒精才能放鬆。你值得的是被好好對待的夜晚。",
     flavor:"果香/草本/氣泡都可能（依配方），清爽感高。",
@@ -324,6 +321,7 @@ let currentMood = null;
 let currentDrink = null;
 let currentHistoryTs = null;
 
+// ✅ 氣泡字數控制，避免遮住熊
 function clampText(s, n=42){
   s = (s||"").trim();
   return s.length > n ? s.slice(0, n) + "…" : s;
@@ -338,56 +336,58 @@ function refreshComicBubble(){
     ? pick(MOOD_3[currentMood] || BEAR_CHAT_30)
     : pick(BEAR_CHAT_30);
 
-  // ✅ 控制長度，避免把熊遮住
   b.textContent = clampText(t, 42);
 }
-
 
 function getPool(){
   if(!currentMood) return DRINKS;
   return DRINKS.filter(d => (d.moods||[]).includes(currentMood));
 }
-
 function findDrink(id){ return DRINKS.find(d=>d.id===id) || null; }
 
 function setFavButton(){
-  if(!currentDrink){ $("btnFav").textContent = "⭐ 收藏"; return; }
-  $("btnFav").textContent = isFav(currentDrink.id) ? "✅ 已收藏" : "⭐ 收藏";
+  const favBtn = $("btnFav");
+  if(!favBtn) return;
+  if(!currentDrink){ favBtn.textContent = "⭐ 收藏"; return; }
+  favBtn.textContent = isFav(currentDrink.id) ? "✅ 已收藏" : "⭐ 收藏";
 }
 
 // ========= 酒卡跳窗 =========
 const drinkMask = $("drinkMask");
-function openDrinkModal(){ drinkMask.classList.add("show"); }
-function closeDrinkModal(){ drinkMask.classList.remove("show"); }
-$("drinkClose").addEventListener("click", closeDrinkModal);
-drinkMask.addEventListener("click", (e)=>{ if(e.target===drinkMask) closeDrinkModal(); });
+function openDrinkModal(){ drinkMask?.classList.add("show"); }
+function closeDrinkModal(){ drinkMask?.classList.remove("show"); }
+$("drinkClose")?.addEventListener("click", closeDrinkModal);
+drinkMask?.addEventListener("click", (e)=>{ if(e.target===drinkMask) closeDrinkModal(); });
 
 function renderDrinkModal(drink, moodUsed, modeLabel, historyTs){
   currentDrink = drink;
   currentHistoryTs = historyTs ?? null;
 
-  $("drinkTitle").textContent = modeLabel || "今晚的一杯";
-  $("drinkEmoji").textContent = drink.emoji;
-  $("drinkName").textContent = drink.name;
-  $("drinkTag").textContent = drink.tag;
+  $("drinkTitle") && ($("drinkTitle").textContent = modeLabel || "今晚的一杯");
+  $("drinkEmoji") && ($("drinkEmoji").textContent = drink.emoji);
+  $("drinkName")  && ($("drinkName").textContent  = drink.name);
+  $("drinkTag")   && ($("drinkTag").textContent   = drink.tag);
 
-  $("drinkMoodLine").style.display = moodUsed ? "inline-block" : "none";
-  if(moodUsed){
-    $("drinkMoodLine").textContent = `依心情：${moodUsed}｜適合：${(drink.moods||[]).join("、")}`;
+  const moodLine = $("drinkMoodLine");
+  if(moodLine){
+    moodLine.style.display = moodUsed ? "inline-block" : "none";
+    if(moodUsed) moodLine.textContent = `依心情：${moodUsed}｜適合：${(drink.moods||[]).join("、")}`;
   }
 
-  $("drinkStory").textContent  = drink.story;
-  $("drinkFlavor").textContent = drink.flavor;
-  $("drinkFollow").textContent = "🐻「" + pick(drink.followUps || ["你今天還好嗎？"]) + "」";
-  $("drinkWarn").textContent   = drink.warn + "\n" + pick(GENERAL_WARN);
+  $("drinkStory")  && ($("drinkStory").textContent  = drink.story);
+  $("drinkFlavor") && ($("drinkFlavor").textContent = drink.flavor);
+  $("drinkFollow") && ($("drinkFollow").textContent = "🐻「" + pick(drink.followUps || ["你今天還好嗎？"]) + "」");
+  $("drinkWarn")   && ($("drinkWarn").textContent   = drink.warn + "\n" + pick(GENERAL_WARN));
 
   // memo 預填
   const memoInput = $("memoInput");
-  memoInput.value = "";
-  if(historyTs){
-    const h = getHistory();
-    const row = h.find(x=>x.ts===historyTs);
-    if(row && row.memo) memoInput.value = row.memo;
+  if(memoInput){
+    memoInput.value = "";
+    if(historyTs){
+      const h = getHistory();
+      const row = h.find(x=>x.ts===historyTs);
+      if(row && row.memo) memoInput.value = row.memo;
+    }
   }
 
   setFavButton();
@@ -395,8 +395,9 @@ function renderDrinkModal(drink, moodUsed, modeLabel, historyTs){
 }
 
 // 保存 memo
-$("btnSaveMemo").addEventListener("click", ()=>{
-  const memo = ($("memoInput").value || "").trim();
+$("btnSaveMemo")?.addEventListener("click", ()=>{
+  const memoInput = $("memoInput");
+  const memo = (memoInput?.value || "").trim();
   if(!memo){ showToast("先寫一句再保存 📝"); return; }
 
   if(!currentHistoryTs){
@@ -411,30 +412,30 @@ $("btnSaveMemo").addEventListener("click", ()=>{
 });
 
 // 收藏 / 複製
-$("btnFav").addEventListener("click", ()=>{
+$("btnFav")?.addEventListener("click", ()=>{
   if(!currentDrink){ showToast("先選一杯再收藏 🐻"); return; }
   const on = toggleFav(currentDrink.id);
   setFavButton();
   showToast(on ? "已收藏 ⭐" : "已取消收藏");
-  if(listMask.classList.contains("show")) renderList();
+  if(listMask?.classList.contains("show")) renderList();
 });
 
-$("btnCopy").addEventListener("click", ()=>{
+$("btnCopy")?.addEventListener("click", ()=>{
   const text =
-`今晚的一杯：${$("drinkName").textContent}
-${$("drinkTag").textContent}
+`今晚的一杯：${$("drinkName")?.textContent || ""}
+${$("drinkTag")?.textContent || ""}
 
 故事：
-${$("drinkStory").textContent}
+${$("drinkStory")?.textContent || ""}
 
 風味：
-${$("drinkFlavor").textContent}
+${$("drinkFlavor")?.textContent || ""}
 
 熊熊追問：
-${$("drinkFollow").textContent}
+${$("drinkFollow")?.textContent || ""}
 
 提醒：
-${$("drinkWarn").textContent}`.trim();
+${$("drinkWarn")?.textContent || ""}`.trim();
 
   navigator.clipboard?.writeText(text);
   showToast("已複製今晚卡片 🐻🍷");
@@ -453,35 +454,36 @@ let catFilter = "all";
 
 function openListModal(tab){
   listTab = tab || "catalog";
-  listMask.classList.add("show");
+  listMask?.classList.add("show");
   setTabs();
   renderList();
-  if(listTab==="catalog") searchInput.focus();
+  if(listTab==="catalog") searchInput?.focus();
 }
-function closeListModal(){ listMask.classList.remove("show"); }
-$("listClose").addEventListener("click", closeListModal);
-listMask.addEventListener("click", (e)=>{ if(e.target===listMask) closeListModal(); });
+function closeListModal(){ listMask?.classList.remove("show"); }
+$("listClose")?.addEventListener("click", closeListModal);
+listMask?.addEventListener("click", (e)=>{ if(e.target===listMask) closeListModal(); });
 
 function setTabs(){
-  $("tabCatalog").classList.toggle("active", listTab==="catalog");
-  $("tabHistory").classList.toggle("active", listTab==="history");
-  $("tabFav").classList.toggle("active", listTab==="fav");
+  $("tabCatalog")?.classList.toggle("active", listTab==="catalog");
+  $("tabHistory")?.classList.toggle("active", listTab==="history");
+  $("tabFav")?.classList.toggle("active", listTab==="fav");
 
-  $("listTitle").textContent =
+  const title =
     listTab==="catalog" ? "📚 酒清單" :
     listTab==="history" ? "🕰️ 紀錄" : "⭐ 收藏";
+  $("listTitle") && ($("listTitle").textContent = title);
 
   const showCatalog = (listTab==="catalog");
-  searchRow.style.display = showCatalog ? "flex" : "none";
-  filterRow.style.display = showCatalog ? "flex" : "none";
+  if(searchRow) searchRow.style.display = showCatalog ? "flex" : "none";
+  if(filterRow) filterRow.style.display = showCatalog ? "flex" : "none";
 }
 
-$("tabCatalog").addEventListener("click", ()=>{ listTab="catalog"; setTabs(); renderList(); });
-$("tabHistory").addEventListener("click", ()=>{ listTab="history"; setTabs(); renderList(); });
-$("tabFav").addEventListener("click", ()=>{ listTab="fav"; setTabs(); renderList(); });
+$("tabCatalog")?.addEventListener("click", ()=>{ listTab="catalog"; setTabs(); renderList(); });
+$("tabHistory")?.addEventListener("click", ()=>{ listTab="history"; setTabs(); renderList(); });
+$("tabFav")?.addEventListener("click", ()=>{ listTab="fav"; setTabs(); renderList(); });
 
-$("btnSearchClear").addEventListener("click", ()=>{ searchInput.value=""; renderList(); });
-searchInput.addEventListener("input", ()=>renderList());
+$("btnSearchClear")?.addEventListener("click", ()=>{ if(searchInput) searchInput.value=""; renderList(); });
+searchInput?.addEventListener("input", ()=>renderList());
 
 filterBtns.forEach(b=>{
   b.addEventListener("click", ()=>{
@@ -492,10 +494,11 @@ filterBtns.forEach(b=>{
 });
 
 function renderList(){
+  if(!listContent) return;
   listContent.innerHTML = "";
 
   if(listTab==="catalog"){
-    const q = (searchInput.value || "").trim();
+    const q = (searchInput?.value || "").trim();
     let pool = DRINKS.slice();
 
     if(catFilter !== "all") pool = pool.filter(d => d.cat === catFilter);
@@ -591,7 +594,7 @@ function renderList(){
   }
 }
 
-listContent.addEventListener("click", async (e)=>{
+listContent?.addEventListener("click", async (e)=>{
   const btn = e.target.closest("button");
   if(!btn) return;
   const action = btn.dataset.action;
@@ -610,8 +613,7 @@ listContent.addEventListener("click", async (e)=>{
     const d = findDrink(id);
     if(!d) return;
 
-    closeListModal(); // ✅ 先關清單，畫面更乾淨
-
+    closeListModal();
     await withLoading(()=>{
       const ts = Date.now();
       addHistory({ts, mood: currentMood, drinkId: d.id, via:"catalog"});
@@ -627,8 +629,7 @@ listContent.addEventListener("click", async (e)=>{
     const d = findDrink(id);
     if(!d) return;
 
-    closeListModal(); // ✅ 先關清單
-
+    closeListModal();
     await withLoading(()=>renderDrinkModal(d, mood || currentMood, "🕰️ 紀錄回顧", ts));
     return;
   }
@@ -649,14 +650,11 @@ listContent.addEventListener("click", async (e)=>{
 });
 
 // 清空
-$("btnClearHistory").addEventListener("click", ()=>{ localStorage.removeItem(KEY_HISTORY); renderList(); showToast("已清空紀錄"); });
-$("btnClearFav").addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV); renderList(); if(currentDrink) setFavButton(); showToast("已清空收藏"); });
+$("btnClearHistory")?.addEventListener("click", ()=>{ localStorage.removeItem(KEY_HISTORY); renderList(); showToast("已清空紀錄"); });
+$("btnClearFav")?.addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV); renderList(); if(currentDrink) setFavButton(); showToast("已清空收藏"); });
 
 // ========= 主畫面按鈕 =========
-document.getElementById("btnIGTop")?.addEventListener("click", (e)=>{
-  // 讓 a 連結本身就能開 IG（這裡不阻止預設）
-});
-$("btnRandom").addEventListener("click", async ()=>{
+$("btnRandom")?.addEventListener("click", async ()=>{
   await withLoading(()=>{
     const pool = getPool();
     const chosen = pool.length ? pick(pool) : pick(DRINKS);
@@ -667,10 +665,14 @@ $("btnRandom").addEventListener("click", async ()=>{
   });
 });
 
-$("btnIG")?.addEventListener("click", ()=>window.open(IG_URL, "_blank"));
+$("btnPickList")?.addEventListener("click", ()=>openListModal("catalog"));
+
+// 你現在底部 dock 三顆按鈕已移除也沒關係：這裡都做了防呆
 $("btnHistory")?.addEventListener("click", ()=>openListModal("history"));
 $("btnFavList")?.addEventListener("click", ()=>openListModal("fav"));
-// ==================== 🎉 派對小遊戲：真心話 / 大冒險（各 15 題） ====================
+$("btnIG")?.addEventListener("click", ()=>window.open(IG_URL, "_blank"));
+
+// ========= 派對小遊戲 =========
 const PARTY_TRUTH_15 = [
   "最近一次讓你真心開心的是什麼？",
   "你現在最想被誰理解？（可以只說角色：朋友/家人/自己）",
@@ -743,7 +745,6 @@ const PARTY_DARE_SPICY_15 = [
   "做一個『不尷尬』的迷你舞步（3 秒）。"
 ];
 
-// 熊熊派對開場（跟「三種心情」連動）
 const PARTY_BEAR_LINES = {
   base: [
     "🐻「玩輕鬆的就好，不想做就換題！」",
@@ -764,18 +765,16 @@ const PARTY_BEAR_LINES = {
   ]
 };
 
-let partyMode = null;         // "truth" | "dare"
+let partyMode = null;
 let partyLastIndex = -1;
 let partyAlcoholOn = false;
 
-// DOM
-const partyMask = document.getElementById("partyMask");
-const partyTitle = document.getElementById("partyTitle");
-const partyType = document.getElementById("partyType");
-const partyTask = document.getElementById("partyTask");
-const partyBearLine = document.getElementById("partyBearLine");
-const partyAvatar = document.getElementById("partyAvatar");
-const partyAlcohol = document.getElementById("partyAlcohol");
+const partyMask = $("partyMask");
+const partyTitle = $("partyTitle");
+const partyType = $("partyType");
+const partyTask = $("partyTask");
+const partyBearLine = $("partyBearLine");
+const partyAlcohol = $("partyAlcohol");
 
 function partyPick(arr){
   if(!arr || arr.length === 0) return "（題庫空了）";
@@ -785,111 +784,78 @@ function partyPick(arr){
   partyLastIndex = i;
   return arr[i];
 }
-
-function getTruthPool(){
-  return partyAlcoholOn ? PARTY_TRUTH_SPICY_15 : PARTY_TRUTH_15;
-}
-function getDarePool(){
-  return partyAlcoholOn ? PARTY_DARE_SPICY_15 : PARTY_DARE_15;
-}
+function getTruthPool(){ return partyAlcoholOn ? PARTY_TRUTH_SPICY_15 : PARTY_TRUTH_15; }
+function getDarePool(){ return partyAlcoholOn ? PARTY_DARE_SPICY_15 : PARTY_DARE_15; }
 
 function partyBearSpeak(){
-  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
+  const mood = currentMood || null;
   const lines = [...PARTY_BEAR_LINES.base];
-
-  // 你的三種心情：放鬆 / 想聊聊 / 想慶祝
   if(mood === "想聊聊") lines.push(...PARTY_BEAR_LINES.chat);
   if(mood === "想慶祝") lines.push(...PARTY_BEAR_LINES.celebrate);
   if(mood === "放鬆")   lines.push(...PARTY_BEAR_LINES.relax);
-
   return partyPick(lines);
 }
-
-function syncPartyAvatar(){
-  if(!partyAvatar) return;
-  if(typeof IMG_TRY !== "undefined" && IMG_TRY.length){
-    partyAvatar.src = IMG_TRY[0];
-    partyAvatar.onerror = ()=>{ partyAvatar.src = IMG_TRY[1] || IMG_TRY[0]; };
-  }
-}
-
 function drawPartyTask(){
   if(!partyTask) return;
   if(partyMode === "truth") partyTask.textContent = partyPick(getTruthPool());
   else if(partyMode === "dare") partyTask.textContent = partyPick(getDarePool());
 }
-
 function openPartyModal(mode){
-  partyMode = mode; // ✅ 關鍵：一定要先設定
+  partyMode = mode;
   const isTruth = (partyMode === "truth");
-
   if(partyTitle) partyTitle.textContent = "🎉 派對小遊戲";
-  if(partyType) partyType.textContent  = isTruth ? "💬 真心話" : "🎯 大冒險";
-
-  syncPartyAvatar();
-
+  if(partyType) partyType.textContent = isTruth ? "💬 真心話" : "🎯 大冒險";
   if(partyBearLine) partyBearLine.textContent = partyBearSpeak();
   drawPartyTask();
-if(partyAlcohol) partyAlcohol.checked = partyAlcoholOn;
+  if(partyAlcohol) partyAlcohol.checked = partyAlcoholOn;
   partyMask?.classList.add("show");
 }
+function closePartyModal(){ partyMask?.classList.remove("show"); }
 
-function closePartyModal(){
-  partyMask?.classList.remove("show");
-}
-
-// 酒精模式開關
 partyAlcohol?.addEventListener("change", ()=>{
   partyAlcoholOn = !!partyAlcohol.checked;
   showToast(partyAlcoholOn ? "酒精模式：派對加辣（仍安全）🍸" : "酒精模式已關閉 🌿");
-  // 如果派對視窗開著，就立刻換題（讓你感覺到有變）
   if(partyMask?.classList.contains("show")) drawPartyTask();
 });
 
-// 按鈕
-document.getElementById("btnPartyTruth")?.addEventListener("click", ()=>openPartyModal("truth"));
-document.getElementById("btnPartyDare")?.addEventListener("click", ()=>openPartyModal("dare"));
+$("btnPartyTruth")?.addEventListener("click", ()=>openPartyModal("truth"));
+$("btnPartyDare")?.addEventListener("click", ()=>openPartyModal("dare"));
 
-// 隨機模式（依心情偏向）
 function decideRandomMode(){
-  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
+  const mood = currentMood || null;
   let pTruth = 0.5;
   if(mood === "想聊聊") pTruth = 0.7;
   if(mood === "想慶祝") pTruth = 0.3;
   if(mood === "放鬆")   pTruth = 0.55;
   return (Math.random() < pTruth) ? "truth" : "dare";
 }
-
-document.getElementById("btnPartyRandom")?.addEventListener("click", ()=>{
+$("btnPartyRandom")?.addEventListener("click", ()=>{
   const m = decideRandomMode();
   openPartyModal(m);
   showToast(m === "truth" ? "隨機：真心話 💬" : "隨機：大冒險 🎯");
 });
 
-// 關閉
-document.getElementById("partyClose")?.addEventListener("click", closePartyModal);
+$("partyClose")?.addEventListener("click", closePartyModal);
 partyMask?.addEventListener("click", (e)=>{ if(e.target === partyMask) closePartyModal(); });
 
-// 下一題
-document.getElementById("partyNext")?.addEventListener("click", ()=>{
+$("partyNext")?.addEventListener("click", ()=>{
   if(!partyMode) return;
   if(partyBearLine) partyBearLine.textContent = partyBearSpeak();
   drawPartyTask();
   showToast("下一題來囉 🎉");
 });
 
-// 點熊熊話語換一句
 partyBearLine?.addEventListener("click", ()=>{
   partyBearLine.textContent = partyBearSpeak();
   showToast("熊熊換一句 🐻");
 });
 
-// 複製題目
-document.getElementById("partyCopy")?.addEventListener("click", ()=>{
+$("partyCopy")?.addEventListener("click", ()=>{
   const t = `${partyType?.textContent || "派對題目"}\n${partyTask?.textContent || ""}`.trim();
   navigator.clipboard?.writeText(t);
   showToast("已複製題目 📋");
 });
+
 // ========= 心情（三種） =========
 const moodButtons = Array.from(document.querySelectorAll(".mood-btn"));
 moodButtons.forEach(btn=>{
@@ -898,20 +864,20 @@ moodButtons.forEach(btn=>{
     if(currentMood===mood){
       currentMood=null;
       moodButtons.forEach(b=>b.classList.remove("active"));
-      $("moodPill").textContent="未選擇";
+      $("moodPill") && ($("moodPill").textContent="未選擇");
       showToast("已取消心情");
     }else{
       currentMood=mood;
       moodButtons.forEach(b=>b.classList.toggle("active", b.dataset.mood===mood));
       const pool=getPool();
-      $("moodPill").textContent=`${mood}（${pool.length} 杯）`;
+      $("moodPill") && ($("moodPill").textContent=`${mood}（${pool.length} 杯）`);
       showToast(`已選擇：${mood}`);
     }
-    refreshComicBubble(); // ✅ 讓熊熊氣泡跟著心情變
+    refreshComicBubble();
   });
 });
 
-// ========= 主畫面點熊熊：換一句（不跳窗） =========
+// ========= 主畫面點熊熊：換一句 =========
 function bindHeroComic(){
   const heroTap = $("heroTap");
   const bubble = $("comicBubble");
@@ -919,7 +885,7 @@ function bindHeroComic(){
     refreshComicBubble();
     showToast("熊熊換一句 🐻");
   };
-  if(heroTap) heroTap.addEventListener("click", next);
+  heroTap?.addEventListener("click", next);
   if(bubble){
     bubble.addEventListener("click", (e)=>{ e.stopPropagation(); next(); });
     bubble.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); next(); }});
@@ -932,9 +898,9 @@ const installBtn = $("btnInstall");
 window.addEventListener("beforeinstallprompt", (e)=>{
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = "flex";
+  if(installBtn) installBtn.style.display = "flex";
 });
-installBtn.addEventListener("click", async ()=>{
+installBtn?.addEventListener("click", async ()=>{
   if(!deferredPrompt){
     showToast("iPhone：Safari 分享 → 加到主畫面");
     return;
@@ -944,7 +910,7 @@ installBtn.addEventListener("click", async ()=>{
   deferredPrompt = null;
   if(choice && choice.outcome==="accepted"){
     showToast("已開始安裝到主畫面 📲");
-    installBtn.style.display = "none";
+    if(installBtn) installBtn.style.display = "none";
   }else{
     showToast("沒關係～想裝再來找我 🐻");
   }
@@ -952,9 +918,10 @@ installBtn.addEventListener("click", async ()=>{
 
 // ========= 初始化 =========
 setBearImages();
-$("todayLine").textContent = pick(TODAY_LINES);
-const cb = $("countBadge");
-if(cb) cb.textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;bindHeroComic();
+$("todayLine") && ($("todayLine").textContent = pick(TODAY_LINES));
+const cb = $("countBadge"); // 你若已刪掉也不會報錯
+if(cb) cb.textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;
+bindHeroComic();
 refreshComicBubble();
 
 // ========= Service Worker =========
