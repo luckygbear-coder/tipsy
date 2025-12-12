@@ -662,6 +662,143 @@ $("btnPickList").addEventListener("click", ()=>openListModal("catalog"));
 $("btnHistory").addEventListener("click", ()=>openListModal("history"));
 $("btnFavList").addEventListener("click", ()=>openListModal("fav"));
 
+// ==================== 🎉 派對小遊戲：真心話 / 大冒險（各 15 題） ====================
+const PARTY_TRUTH_15 = [
+  "最近一次讓你真心開心的是什麼？",
+  "你現在最想被誰理解？（可以只說角色：朋友/家人/自己）",
+  "如果今天可以不用負責，你最想做什麼？",
+  "你覺得自己其實很棒，但很少說出口的一點是？",
+  "最近有沒有一件事，你其實有點累但還在撐？",
+  "你想對『未來的自己』說一句什麼？",
+  "有沒有一首歌，一聽就會想到某個人？",
+  "最近一次被感動，是因為什麼？",
+  "你覺得現在的生活，比一年前更好嗎？為什麼？",
+  "如果今天可以重來一次，你會改變哪個小決定？",
+  "你現在最想感謝的人是誰？（可以不說名字）",
+  "你最近的小確幸是什麼？",
+  "最近最讓你安心的一個瞬間是？",
+  "如果今晚什麼都不用完成，你希望怎麼結束這一天？",
+  "用一句話形容現在的你。"
+];
+
+const PARTY_DARE_15 = [
+  "選一個人，對他說一句真心稱讚。",
+  "用一句話形容『今天的你』，但不能用形容詞。",
+  "幫大家拍一張現在的合照（或自拍）。",
+  "模仿熊熊的語氣說一句安慰人的話。",
+  "分享一張手機裡最近的一張照片（不用解釋）。",
+  "幫下一個人選一個『心情 emoji』。",
+  "說一句最近對自己最溫柔的話。",
+  "選一首歌，讓大家聽 15 秒。",
+  "用三個字形容今天的聚會。",
+  "幫大家倒水或整理桌面一次（小小的也可以）。",
+  "用一句話祝福在場的所有人。",
+  "分享一個你最近學到的小發現。",
+  "跟大家一起深呼吸 3 次（帶節奏：吸-停-吐）。",
+  "選一個人，問他一個你真的好奇的問題。",
+  "用一句話幫今天的派對收尾。"
+];
+
+// 熊熊派對開場（輕量跟心情連動；不跟喝酒狀態連動）
+const PARTY_BEAR_LINES = {
+  base: [
+    "🐻「玩輕鬆的就好，不想做就換題！」",
+    "🐻「我們以舒服為主，尷尬就跳過～」",
+    "🐻「今天的目標：笑一下就賺到了。」"
+  ],
+  chat: [
+    "🐻「想聊天很棒～慢慢說就好。」",
+    "🐻「真心話不用很深，真就好。」"
+  ],
+  celebrate: [
+    "🐻「派對模式開啟！做不到就換題～」",
+    "🐻「大冒險也要可愛安全那種喔！」"
+  ],
+  sober: [
+    "🐻「清醒也能玩超嗨！不喝也很酷。」",
+    "🐻「安全第一～我們玩氣氛不玩逞強。」"
+  ]
+};
+
+let partyMode = null;     // "truth" | "dare"
+let partyLastIndex = -1;
+
+const partyMask = document.getElementById("partyMask");
+const partyTitle = document.getElementById("partyTitle");
+const partyType = document.getElementById("partyType");
+const partyTask = document.getElementById("partyTask");
+const partyBearLine = document.getElementById("partyBearLine");
+const partyAvatar = document.getElementById("partyAvatar");
+
+function partyPick(arr){
+  if(arr.length <= 1) return arr[0];
+  let i = Math.floor(Math.random()*arr.length);
+  if(i === partyLastIndex) i = (i + 1) % arr.length;
+  partyLastIndex = i;
+  return arr[i];
+}
+
+function partyBearSpeak(){
+  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
+  const lines = [...PARTY_BEAR_LINES.base];
+
+  if(mood === "想聊天") lines.push(...PARTY_BEAR_LINES.chat);
+  if(mood === "想慶祝") lines.push(...PARTY_BEAR_LINES.celebrate);
+  if(mood === "清醒也好") lines.push(...PARTY_BEAR_LINES.sober);
+
+  return partyPick(lines);
+}
+
+function openPartyModal(mode){
+  partyMode = mode;
+
+  // ✅ 同步熊熊頭像（沿用你原本 IMG_TRY 容錯）
+  if(partyAvatar){
+    partyAvatar.src = (typeof IMG_TRY !== "undefined") ? IMG_TRY[0] : partyAvatar.src;
+    partyAvatar.onerror = ()=> {
+      if(typeof IMG_TRY !== "undefined") partyAvatar.src = IMG_TRY[1];
+    };
+  }
+
+  const isTruth = mode === "truth";
+  partyTitle.textContent = isTruth ? "💬 真心話" : "🎯 大冒險";
+  partyType.textContent = isTruth ? "💬 真心話｜抽一題" : "🎯 大冒險｜抽一題";
+
+  partyBearLine.textContent = partyBearSpeak();
+  partyTask.textContent = isTruth ? partyPick(PARTY_TRUTH_15) : partyPick(PARTY_DARE_15);
+
+  partyMask.classList.add("show");
+}
+
+function closePartyModal(){
+  partyMask.classList.remove("show");
+}
+
+document.getElementById("btnPartyTruth")?.addEventListener("click", ()=>openPartyModal("truth"));
+document.getElementById("btnPartyDare")?.addEventListener("click", ()=>openPartyModal("dare"));
+
+document.getElementById("partyClose")?.addEventListener("click", closePartyModal);
+partyMask?.addEventListener("click", (e)=>{ if(e.target === partyMask) closePartyModal(); });
+
+document.getElementById("partyNext")?.addEventListener("click", ()=>{
+  if(!partyMode) return;
+  partyBearLine.textContent = partyBearSpeak();
+  partyTask.textContent = partyMode === "truth" ? partyPick(PARTY_TRUTH_15) : partyPick(PARTY_DARE_15);
+  if(typeof showToast === "function") showToast("下一題來囉 🎉");
+});
+
+// 點熊熊話語換一句
+partyBearLine?.addEventListener("click", ()=>{
+  partyBearLine.textContent = partyBearSpeak();
+  if(typeof showToast === "function") showToast("熊熊換一句 🐻");
+});
+
+// 複製題目
+document.getElementById("partyCopy")?.addEventListener("click", ()=>{
+  const t = `${partyTitle.textContent}\n${partyTask.textContent}`.trim();
+  navigator.clipboard?.writeText(t);
+  if(typeof showToast === "function") showToast("已複製題目 📋");
+});
 // ========= 心情（三種） =========
 const moodButtons = Array.from(document.querySelectorAll(".mood-btn"));
 moodButtons.forEach(btn=>{
