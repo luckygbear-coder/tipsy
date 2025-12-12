@@ -1,19 +1,20 @@
-const CACHE_NAME = "tipsy-bear-v3";
+const CACHE_NAME = "tipsy-bear-v1";
+
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./sw.js",
-  "./Images/tipsy-bear.png",
-  "./images/tipsy-bear.png",
   "./icons/tipsy-bear-192.png",
   "./icons/tipsy-bear-512.png",
-  "./icons/tipsy-bear-1024.png"
+  // 你的熊熊主圖（容錯兩種資料夾）
+  "./images/tipsy-bear.png",
+  "./Images/tipsy-bear.png"
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(()=>cache.addAll(ASSETS.filter(x=>!x.includes("./Images/")))))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(()=>{})
   );
   self.skipWaiting();
 });
@@ -21,19 +22,20 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k === CACHE_NAME ? null : caches.delete(k))))
+      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   );
   self.clients.claim();
 });
 
+// cache-first + fallback network
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(res => {
+    caches.match(req).then((cached) => cached || fetch(req).then((res)=>{
       const copy = res.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+      caches.open(CACHE_NAME).then((cache)=>cache.put(req, copy)).catch(()=>{});
       return res;
-    }).catch(() => cached))
+    }).catch(()=>cached))
   );
 });
