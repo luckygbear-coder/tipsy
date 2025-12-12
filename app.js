@@ -614,8 +614,10 @@ function setTabs(){
   const showCatalog = (listTab==="catalog");
   if(searchRow) searchRow.style.display = showCatalog ? "flex" : "none";
   if(filterRow) filterRow.style.display = showCatalog ? "flex" : "none";
-}
 
+  const moodRow = document.getElementById("moodFilterRow");
+  if(moodRow) moodRow.style.display = showCatalog ?
+}
 $("tabCatalog")?.addEventListener("click", ()=>{ listTab="catalog"; setTabs(); renderList(); });
 $("tabHistory")?.addEventListener("click", ()=>{ listTab="history"; setTabs(); renderList(); });
 $("tabFav")?.addEventListener("click", ()=>{ listTab="fav"; setTabs(); renderList(); });
@@ -628,8 +630,16 @@ filterBtns.forEach(b=>{
     catFilter = b.dataset.cat;
     filterBtns.forEach(x=>x.classList.toggle("active", x.dataset.cat===catFilter));
     renderList();
+    // ✅ 心情快速切換（只作用於 catalog）
+const moodFilterBtns = Array.from(document.querySelectorAll(".mood-filter-btn"));
+moodFilterBtns.forEach(b=>{
+  b.addEventListener("click", ()=>{
+    moodFilter = b.dataset.mood || "all";
+    moodFilterBtns.forEach(x=>x.classList.toggle("active", x.dataset.mood===moodFilter));
+    renderList();
   });
 });
+
 
 function renderList(){
   if(!listContent) return;
