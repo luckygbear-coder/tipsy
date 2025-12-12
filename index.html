@@ -34,7 +34,7 @@
       background:var(--bg);
       font-family:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       color:var(--text);
-      overflow:hidden; /* ✅ 主體不捲動，交給 main / modal 捲 */
+      overflow:hidden;
     }
 
     /* ✅ iOS 正確滿版：用 dvh + 預留底欄空間 */
@@ -84,8 +84,29 @@
       position:relative;
       flex:1;
       min-height:220px;
+
+      cursor:pointer;
+      user-select:none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
-    .hero img{width:100%;height:100%;object-fit:cover;display:block}
+    .hero, .hero *{
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+    }
+    .hero img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      -webkit-user-drag:none;
+      user-drag:none;
+      pointer-events:none; /* 點擊穿透到 .hero */
+    }
+    .hero:active{
+      transform: translateY(1px) scale(.995);
+      filter: brightness(.99);
+      transition: transform .08s ease, filter .15s ease;
+    }
+
     .badge{
       position:absolute; left:10px; top:10px;
       background:rgba(255,247,230,.92);
@@ -93,6 +114,15 @@
       padding:8px 10px; border-radius:999px;
       font-size:12px;
       box-shadow:0 6px 14px rgba(0,0,0,.10);
+    }
+
+    .tapHint{
+      position:absolute; right:10px; top:10px;
+      background:rgba(255,247,230,.92);
+      border:2px dashed var(--border);
+      padding:8px 10px; border-radius:999px;
+      font-size:12px;
+      box-shadow:0 6px 14px rgba(0,0,0,.08);
     }
 
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -115,7 +145,6 @@
     .btn.secondary{background:#fff;}
     .btn.ig{background:linear-gradient(180deg,var(--pink1),var(--pink2));}
     .btn.small{padding:10px 10px; font-size:13px; border-radius:14px;}
-    .btn.ghost{background:#fff; border-style:dashed;}
 
     .moods{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
     .mood-btn{
@@ -191,7 +220,7 @@
       box-shadow:0 -12px 30px rgba(0,0,0,.22);
       padding:14px;
 
-      max-height: 88dvh; /* ✅ iOS 不忽大忽小 */
+      max-height: 88dvh;
       overflow:hidden;
     }
     .modal-head{
@@ -210,7 +239,7 @@
       user-select:none;
     }
 
-    /* 熊熊對話（可點換句） */
+    /* 熊熊對話 */
     .chat-row{display:flex; gap:10px; align-items:flex-start; margin-top:6px;}
     .avatar{
       width:42px;height:42px;border-radius:14px;
@@ -400,17 +429,23 @@
       align-items:center;
       margin-top:10px;
     }
-.memo-wrap input{
-  flex:1;
-  border:2px solid rgba(225,182,118,.7);
-  border-radius:14px;
-  padding:10px 12px;
-  font-size:16px;
-  outline:none;
-  background:#fff;
-}
+    .memo-wrap input{
+      flex:1;
+      border:2px solid rgba(225,182,118,.7);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:16px;
+      outline:none;
+      background:#fff;
     }
 
+    .chatOnly-note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+      text-align:center;
+    }
   </style>
 </head>
 
@@ -427,11 +462,11 @@
     </div>
 
     <div class="main">
-<div class="hero" id="heroTap">
-  <img id="bearHeroImg" alt="微醺熊主圖">
-  <div class="badge" id="countBadge">🍇 微醺酒窖｜已收錄 33 杯</div>
-  <div class="tapHint">👆 點熊熊聊天</div>
-</div>
+      <div class="hero" id="heroTap" title="點我跟熊熊聊聊">
+        <img id="bearHeroImg" alt="微醺熊主圖">
+        <div class="badge" id="countBadge">🍇 微醺酒窖｜已收錄 33 杯</div>
+        <div class="tapHint">👆 點熊熊聊天</div>
+      </div>
 
       <div class="row2">
         <button class="btn" id="btnRandom">🎲 隨機一杯</button>
@@ -527,7 +562,6 @@
           <div class="text warn" id="drinkWarn">—</div>
         </div>
 
-        <!-- ✅ 今晚我想記住 -->
         <div class="block">
           <div class="label">📝 今晚我想記住</div>
           <div class="memo-wrap">
@@ -560,7 +594,6 @@
         <button class="tab" id="tabFav">⭐ 收藏</button>
       </div>
 
-      <!-- ✅ 分類篩選 -->
       <div class="filters" id="filterRow">
         <button class="filter-btn active" data-cat="all">全部</button>
         <button class="filter-btn" data-cat="beer">啤酒</button>
@@ -587,32 +620,60 @@
     </div>
   </div>
 
+  <!-- ✅ 主畫面點熊熊 → 純聊天跳窗 -->
+  <div class="modal-mask" id="bearChatMask">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>🐻 熊熊陪你一下</h3>
+        <button class="xbtn" id="bearChatClose">關閉 ✕</button>
+      </div>
+
+      <div class="chat-row">
+        <div class="avatar"><img id="bearAvatarChat" alt="微醺熊"></div>
+        <div style="flex:1">
+          <div class="bubble" id="bearChatBubble" title="點我換一句 🐻">🐻「我在這裡。」</div>
+          <div class="bubble-tip">（點一下熊熊話語，可以換一句）</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="chatOnly-note">你可以不喝酒，只聊天也可以。<br>我在這裡陪你。</div>
+      </div>
+
+      <div class="row2" style="margin-top:10px;">
+        <button class="btn small secondary" id="btnCopyChat">📋 複製這句</button>
+        <button class="btn small" id="btnCloseChat2">我知道了</button>
+      </div>
+
+      <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車</div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">已複製</div>
 
   <script>
     // ========= 圖片路徑容錯（Images/ 或 images/ 都可） =========
     const IMG_TRY = ["Images/tipsy-bear.png", "images/tipsy-bear.png"];
     function setBearImages(){
-      const targets = ["bearIconTop","bearHeroImg","bearAvatar","loadBear"];
+      const targets = ["bearIconTop","bearHeroImg","bearAvatar","loadBear","bearAvatarChat"];
       let idx = 0;
       const apply = () => targets.forEach(id => { const el = document.getElementById(id); if(el) el.src = IMG_TRY[idx]; });
       apply();
       const hero = document.getElementById("bearHeroImg");
-      hero.onerror = () => { idx = Math.min(idx+1, IMG_TRY.length-1); apply(); };
+      if(hero){
+        hero.onerror = () => { idx = Math.min(idx+1, IMG_TRY.length-1); apply(); };
+      }
     }
-// ===== Hero 防誤觸（避免拖曳/長按選取）=====
-(function lockHeroTouch(){
-  const hero = document.getElementById("heroTap");
-  if(!hero) return;
-.hero{ touch-action: manipulation; }
-.hero, .hero *{ -webkit-tap-highlight-color: transparent; }
-  // 阻止長按選字 / 拖曳
-  hero.addEventListener("dragstart", (e)=>e.preventDefault());
-  hero.addEventListener("contextmenu", (e)=>e.preventDefault());
 
-  // iOS 長按可能觸發 selection / callout，這裡更保險
-  hero.addEventListener("touchstart", ()=>{}, {passive:true});
-})();
+    // ===== Hero 防誤觸（避免拖曳/長按選取）=====
+    (function lockHeroTouch(){
+      const hero = document.getElementById("heroTap");
+      if(!hero) return;
+      hero.addEventListener("dragstart", (e)=>e.preventDefault());
+      hero.addEventListener("contextmenu", (e)=>e.preventDefault());
+      hero.addEventListener("touchstart", ()=>{}, {passive:true});
+    })();
+
     // ========= 基本 =========
     const IG_URL = "https://instagram.com/luckygbear";
     const KEY_HISTORY = "tipsyBear_history_v5";
@@ -767,7 +828,6 @@
         trait:"重啟感、清醒感高、很解膩。",
         warn:"胃酸敏感者配食物；慢喝。",
         followUps:["你想重新開始的第一步是？","你願意把今天當練習嗎？","你最想清爽掉的是什麼？"]},
-
       {id:11, cat:"white", emoji:"🍷", name:"粉紅酒（Rosé）", tag:"輕盈可愛・剛剛好", moods:["開心","想慶祝","想聊天"],
         story:"像一句剛剛好的稱讚：不過度、不敷衍，很剛好。",
         flavor:"莓果、花香、輕盈微甜（依風格）。",
@@ -915,8 +975,8 @@
     // ========= 狀態 =========
     let currentMood = null;
     let currentDrink = null;
-    let currentHistoryTs = null; // ✅ 這次紀錄 ts，用於寫 memo
-    let bearLineFactory = null;  // ✅ 點氣泡換句
+    let currentHistoryTs = null;
+    let bearLineFactory = null;
 
     function findDrink(id){ return DRINKS.find(d=>d.id===id) || null; }
     function getPool(){
@@ -973,7 +1033,6 @@
       $("drinkTrait").textContent = drink.trait;
       $("drinkWarn").textContent = drink.warn + "\n" + pick(GENERAL_WARN);
 
-      // memo 預填
       const memoInput = $("memoInput");
       memoInput.value = "";
       if(historyTs){
@@ -986,32 +1045,19 @@
       openDrinkModal();
     }
 
-    // ✅ 點熊熊氣泡換一句
     $("bearBubble").addEventListener("click", ()=>{
-      if(!bearLineFactory){
-        $("bearBubble").textContent = pick(BEAR_EXTRA_LINES);
-        return;
-      }
-      $("bearBubble").textContent = bearLineFactory();
+      $("bearBubble").textContent = (bearLineFactory ? bearLineFactory() : pick(BEAR_EXTRA_LINES));
       showToast("熊熊換一句陪你 🐻");
     });
 
-    // ✅ 今晚我想記住：保存 memo（寫入 localStorage，顯示在歷史）
     $("btnSaveMemo").addEventListener("click", ()=>{
       const memo = ($("memoInput").value || "").trim();
       if(!memo){ showToast("先寫一句再保存 📝"); return; }
 
       if(!currentHistoryTs){
-        // 沒有對應紀錄就新增一筆
         const ts = Date.now();
         currentHistoryTs = ts;
-        addHistory({
-          ts,
-          mood: currentMood,
-          drinkId: currentDrink ? currentDrink.id : null,
-          via: "memoOnly",
-          memo
-        });
+        addHistory({ ts, mood: currentMood, drinkId: currentDrink ? currentDrink.id : null, via: "memoOnly", memo });
         showToast("已保存到紀錄 📝");
         return;
       }
@@ -1020,7 +1066,6 @@
       showToast(ok ? "已保存到紀錄 📝" : "保存失敗（找不到紀錄）");
     });
 
-    // 收藏 / 複製
     $("btnFav").addEventListener("click", ()=>{
       if(!currentDrink){ showToast("先選一杯再收藏 🐻"); return; }
       const on = toggleFav(currentDrink.id);
@@ -1044,7 +1089,7 @@
     const filterBtns = Array.from(document.querySelectorAll(".filter-btn"));
 
     let listTab = "catalog"; // catalog / history / fav
-    let catFilter = "all";   // all/beer/red/white/spirit/cocktail/na
+    let catFilter = "all";
 
     function openListModal(tab){
       listTab = tab || "catalog";
@@ -1078,7 +1123,6 @@
     $("btnSearchClear").addEventListener("click", ()=>{ searchInput.value=""; renderList(); });
     searchInput.addEventListener("input", ()=>renderList());
 
-    // ✅ 分類篩選
     filterBtns.forEach(b=>{
       b.addEventListener("click", ()=>{
         catFilter = b.dataset.cat;
@@ -1094,12 +1138,8 @@
         const q = (searchInput.value || "").trim();
         let pool = DRINKS.slice();
 
-        if(catFilter !== "all"){
-          pool = pool.filter(d => d.cat === catFilter);
-        }
-        if(q){
-          pool = pool.filter(d => (d.name + " " + d.tag).includes(q));
-        }
+        if(catFilter !== "all") pool = pool.filter(d => d.cat === catFilter);
+        if(q) pool = pool.filter(d => (d.name + " " + d.tag).includes(q));
 
         if(pool.length===0){
           listContent.innerHTML = `<div class="smallnote">找不到符合條件的酒～換個分類或關鍵字試試 🐻</div>`;
@@ -1244,12 +1284,14 @@
       }
     });
 
-    // 清空
     $("btnClearHistory").addEventListener("click", ()=>{ localStorage.removeItem(KEY_HISTORY); renderList(); showToast("已清空歷史"); });
     $("btnClearFav").addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV); renderList(); if(currentDrink) setFavButton(); showToast("已清空收藏"); });
 
     // ========= 主畫面按鈕 =========
     $("btnIG").addEventListener("click", ()=>window.open(IG_URL, "_blank"));
+    $("btnPickList").addEventListener("click", ()=>openListModal("catalog"));
+    $("btnHistory").addEventListener("click", ()=>openListModal("history"));
+    $("btnFavList").addEventListener("click", ()=>openListModal("fav"));
 
     $("btnRandom").addEventListener("click", async ()=>{
       await withLoading(()=>{
@@ -1261,10 +1303,6 @@
         if(currentMood && pool.length===0) showToast("這個心情沒有對應酒款，改用全酒窖隨機 🐻");
       });
     });
-
-    $("btnPickList").addEventListener("click", ()=>openListModal("catalog"));
-    $("btnHistory").addEventListener("click", ()=>openListModal("history"));
-    $("btnFavList").addEventListener("click", ()=>openListModal("fav"));
 
     $("btnTalk").addEventListener("click", async ()=>{
       await withLoading(()=>{
@@ -1346,88 +1384,73 @@
       });
     });
 
+    // ===== 主畫面點熊熊：純聊天 30 句（不影響酒介紹/歷史/收藏） =====
+    const BEAR_CHAT_30 = [
+      "🐻「你來了就好，我在。」",
+      "🐻「今天的你辛苦了。」",
+      "🐻「不用把自己逼太緊，真的。」",
+      "🐻「你不用表現得很堅強。」",
+      "🐻「你願意說一點點就好。」",
+      "🐻「如果你想哭，也沒關係。」",
+      "🐻「你不是一個人。」",
+      "🐻「我可以陪你把今天收起來。」",
+      "🐻「先深呼吸一下，好嗎？」",
+      "🐻「你做得比你想的還多。」",
+      "🐻「我想抱抱你（如果你願意）。」",
+      "🐻「你可以慢慢來，沒人催你。」",
+      "🐻「你不需要立刻好起來。」",
+      "🐻「你的感受很重要。」",
+      "🐻「我在聽，你說。」",
+      "🐻「今天最累的是哪裡？」",
+      "🐻「你最想被理解的是什麼？」",
+      "🐻「你願意對自己溫柔一點嗎？」",
+      "🐻「你已經很努力了，真的。」",
+      "🐻「如果可以放下 1%，你想放下什麼？」",
+      "🐻「你值得被好好對待。」",
+      "🐻「不用急著給答案。」",
+      "🐻「你可以先休息，再決定。」",
+      "🐻「今晚只做一件事：照顧你。」",
+      "🐻「你想要陪伴，還是想要方向？」",
+      "🐻「你願意把心事說給我聽嗎？」",
+      "🐻「我不評價你，我只陪你。」",
+      "🐻「你今天有一點點快樂嗎？」",
+      "🐻「明天的事，明天再說。」",
+      "🐻「你願意原諒自己一次嗎？」"
+    ];
+
+    const bearChatMask = $("bearChatMask");
+    const bearChatBubble = $("bearChatBubble");
+    const bearChatClose = $("bearChatClose");
+    const btnCopyChat = $("btnCopyChat");
+    const btnCloseChat2 = $("btnCloseChat2");
+    const heroTap = $("heroTap");
+
+    function openBearChat(){
+      bearChatBubble.textContent = pick(BEAR_CHAT_30);
+      bearChatMask.classList.add("show");
+    }
+    function closeBearChat(){
+      bearChatMask.classList.remove("show");
+    }
+
+    heroTap.addEventListener("click", openBearChat);
+    bearChatBubble.addEventListener("click", ()=>{
+      bearChatBubble.textContent = pick(BEAR_CHAT_30);
+      showToast("熊熊換一句陪你 🐻");
+    });
+    bearChatClose.addEventListener("click", closeBearChat);
+    btnCloseChat2.addEventListener("click", closeBearChat);
+    bearChatMask.addEventListener("click", (e)=>{ if(e.target===bearChatMask) closeBearChat(); });
+    btnCopyChat.addEventListener("click", ()=>{
+      navigator.clipboard?.writeText((bearChatBubble.textContent||"").trim());
+      showToast("已複製 🐻");
+    });
+
     // ========= 初始化 =========
     setBearImages();
     $("todayLine").textContent = pick(TODAY_LINES);
     $("countBadge").textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;
-// ===== 主畫面點熊熊：純聊天 30 句（不影響酒介紹/歷史/收藏） =====
-const BEAR_CHAT_30 = [
-  "🐻「你來了就好，我在。」",
-  "🐻「今天的你辛苦了。」",
-  "🐻「不用把自己逼太緊，真的。」",
-  "🐻「你不用表現得很堅強。」",
-  "🐻「你願意說一點點就好。」",
-  "🐻「如果你想哭，也沒關係。」",
-  "🐻「你不是一個人。」",
-  "🐻「我可以陪你把今天收起來。」",
-  "🐻「先深呼吸一下，好嗎？」",
-  "🐻「你做得比你想的還多。」",
-  "🐻「我想抱抱你（如果你願意）。」",
-  "🐻「你可以慢慢來，沒人催你。」",
-  "🐻「你不需要立刻好起來。」",
-  "🐻「你的感受很重要。」",
-  "🐻「我在聽，你說。」",
-  "🐻「今天最累的是哪裡？」",
-  "🐻「你最想被理解的是什麼？」",
-  "🐻「你願意對自己溫柔一點嗎？」",
-  "🐻「你已經很努力了，真的。」",
-  "🐻「如果可以放下 1%，你想放下什麼？」",
-  "🐻「你值得被好好對待。」",
-  "🐻「不用急著給答案。」",
-  "🐻「你可以先休息，再決定。」",
-  "🐻「今晚只做一件事：照顧你。」",
-  "🐻「你想要陪伴，還是想要方向？」",
-  "🐻「你願意把心事說給我聽嗎？」",
-  "🐻「我不評價你，我只陪你。」",
-  "🐻「你今天有一點點快樂嗎？」",
-  "🐻「明天的事，明天再說。」",
-  "🐻「你願意原諒自己一次嗎？」"
-];
 
-const bearChatMask = document.getElementById("bearChatMask");
-const bearChatBubble = document.getElementById("bearChatBubble");
-const bearChatClose = document.getElementById("bearChatClose");
-const btnCopyChat = document.getElementById("btnCopyChat");
-const btnCloseChat2 = document.getElementById("btnCloseChat2");
-const heroTap = document.getElementById("heroTap");
-const bearAvatarChat = document.getElementById("bearAvatarChat");
-
-function openBearChat(){
-  if(bearChatBubble) bearChatBubble.textContent = pick(BEAR_CHAT_30);
-  if(bearChatMask) bearChatMask.classList.add("show");
-}
-function closeBearChat(){
-  if(bearChatMask) bearChatMask.classList.remove("show");
-}
-
-// ✅ 讓聊天跳窗也用同一張熊熊圖（沿用你現有 setBearImages 的容錯路徑）
-(function syncChatAvatar(){
-  if(!bearAvatarChat) return;
-  // 先用第一個路徑，若你 setBearImages 已切換，這裡也會跟著顯示
-  bearAvatarChat.src = IMG_TRY[0];
-  bearAvatarChat.onerror = ()=>{ bearAvatarChat.src = IMG_TRY[1]; };
-})();
-
-// 主畫面點熊熊 → 開聊天
-if(heroTap) heroTap.addEventListener("click", openBearChat);
-
-// 點氣泡換一句
-if(bearChatBubble) bearChatBubble.addEventListener("click", ()=>{
-  bearChatBubble.textContent = pick(BEAR_CHAT_30);
-  showToast("熊熊換一句陪你 🐻");
-});
-
-// 關閉
-if(bearChatClose) bearChatClose.addEventListener("click", closeBearChat);
-if(btnCloseChat2) btnCloseChat2.addEventListener("click", closeBearChat);
-if(bearChatMask) bearChatMask.addEventListener("click", (e)=>{ if(e.target===bearChatMask) closeBearChat(); });
-
-// 複製
-if(btnCopyChat) btnCopyChat.addEventListener("click", ()=>{
-  const t = (bearChatBubble?.textContent || "").trim();
-  navigator.clipboard?.writeText(t);
-  showToast("已複製 🐻");
-});
     // ========= PWA：安裝 =========
     let deferredPrompt = null;
     const installBtn = $("btnInstall");
@@ -1451,76 +1474,11 @@ if(btnCopyChat) btnCopyChat.addEventListener("click", ()=>{
         showToast("沒關係～想裝再來找我 🐻");
       }
     });
-<!-- ✅ Modal：主畫面點熊熊 → 純聊天跳窗 -->
-<div class="modal-mask" id="bearChatMask">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>🐻 熊熊陪你一下</h3>
-      <button class="xbtn" id="bearChatClose">關閉 ✕</button>
-    </div>
 
-    <div class="chat-row">
-      <div class="avatar"><img id="bearAvatarChat" alt="微醺熊"></div>
-      <div style="flex:1">
-        <div class="bubble" id="bearChatBubble" title="點我換一句 🐻">🐻「我在這裡。」</div>
-        <div class="bubble-tip">（點一下熊熊話語，可以換一句）</div>
-      </div>
-    </div>
-
-    <div class="content">
-      <div class="chatOnly-note">你可以不喝酒，只聊天也可以。<br>我在這裡陪你。</div>
-    </div>
-
-    <div class="row2" style="margin-top:10px;">
-      <button class="btn small secondary" id="btnCopyChat">📋 複製這句</button>
-      <button class="btn small" id="btnCloseChat2">我知道了</button>
-    </div>
-
-    <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車</div>
-  </div>
-</div>
     // ========= Service Worker =========
     if("serviceWorker" in navigator){
       window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
     }
   </script>
-      /* ===== 主畫面點熊熊：純聊天跳窗（不影響酒功能） ===== */
-.hero{ cursor:pointer; user-select:none; }
-
-.tapHint{
-  position:absolute; right:10px; top:10px;
-  background:rgba(255,247,230,.92);
-  border:2px dashed var(--border);
-  padding:8px 10px; border-radius:999px;
-  font-size:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-}
-
-.chatOnly-note{
-  margin-top:10px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-  text-align:center;
-}
-/* ===== Hero 防誤觸（像 App） ===== */
-.hero, .hero *{
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none; /* iOS 長按不跳出選單 */
-}
-
-.hero img{
-  -webkit-user-drag: none;     /* iOS/Safari 禁止拖曳圖片 */
-  user-drag: none;
-  pointer-events: none;         /* 點擊穿透到 .hero（避免點到圖片本身） */
-}
-
-/* 點擊回饋更像按鈕 */
-.hero:active{
-  transform: translateY(1px) scale(.995);
-  filter: brightness(.99);
-  transition: transform .08s ease, filter .15s ease;
-}
 </body>
 </html>
