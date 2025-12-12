@@ -1,15 +1,10 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<!-- ✅ 最上方主題：改成 IG 連結按鈕 -->
-<a id="btnIGTop" class="top-ig-btn" href="https://instagram.com/luckygbear" target="_blank" rel="noopener">
-  <img class="top-ig-icon" src="images/tipsy-bear.png" alt="微醺熊" />
-  <div class="top-ig-text">
-    <div class="top-ig-title">找微醺熊聊心事 🐻🍷</div>
-    <div class="top-ig-sub">點我去 IG，跟熊熊聊聊</div>
-  </div>
-  <div class="top-ig-arrow">›</div>
-</a>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>找微醺熊講心事 🐻🍷</title>
+
   <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#ffeec9" />
@@ -22,7 +17,18 @@
 <body>
   <div class="app">
     <header class="header">
-      <div class="topbar">
+      <!-- ✅ 最上方主題：改成 IG 連結按鈕（注意：一定要在 body 裡） -->
+      <a id="btnIGTop" class="top-ig-btn" href="https://instagram.com/luckygbear" target="_blank" rel="noopener">
+        <img class="top-ig-icon" src="images/tipsy-bear.png" alt="微醺熊" />
+        <div class="top-ig-text">
+          <div class="top-ig-title">找微醺熊聊心事 🐻🍷</div>
+          <div class="top-ig-sub">點我去 IG，跟熊熊聊聊</div>
+        </div>
+        <div class="top-ig-arrow">›</div>
+      </a>
+
+      <!-- ✅ 你原本的標題區塊保留（也可以之後再刪更簡潔） -->
+      <div class="topbar" style="margin-top:12px;">
         <div class="logo"><img id="bearIconTop" alt="微醺熊"></div>
         <div class="title">
           <h1>找微醺熊講心事 🐻🍷</h1>
@@ -32,37 +38,40 @@
     </header>
 
     <main class="main">
- <!-- ✅ 熊主視覺卡片：圖片 + 氣泡（在熊頭上） -->
-<div class="hero-card" id="heroTap">
-  <div class="hero-media">
-    <img id="bearHeroImg" class="hero-img" src="images/tipsy-bear.png" alt="tipsy bear" />
+      <!-- ✅ 熊主視覺卡片：圖片 + 氣泡（在熊頭上） -->
+      <div class="hero-card" id="heroTap">
+        <div class="hero-media">
+          <img id="bearHeroImg" class="hero-img" src="images/tipsy-bear.png" alt="tipsy bear" />
 
-    <!-- ✅ 氣泡改到熊頭上（放在圖片上方） -->
-    <div id="comicBubble" class="comic-bubble over-bear" tabindex="0" role="button" aria-label="點一下換一句">
-      🐻「你來了就好，我在。」
-    </div>
+          <!-- ✅ 氣泡在熊頭上 -->
+          <div id="comicBubble" class="comic-bubble over-bear" tabindex="0" role="button" aria-label="點一下換一句">
+            🐻「你來了就好，我在。」
+          </div>
 
-    <!-- ✅ 右下角提示（原本右上角那個） -->
-    <div class="hero-hint">☝️ 點熊熊或氣泡換一句</div>
-  </div>
-</div>
+          <!-- ✅ 右下角提示 -->
+          <div class="hero-hint">☝️ 點熊熊或氣泡換一句</div>
+        </div>
+      </div>
+
       <!-- ✅ 只留兩個主操作 -->
       <section class="row2">
         <button class="btn" id="btnRandom">🎲 隨機一杯</button>
         <button class="btn secondary" id="btnPickList">📚 酒清單</button>
       </section>
-<!-- 🎉 派對小遊戲（放在：隨機一杯/酒清單 下方，心情按鈕上方） -->
-<div class="party-wrap">
-  <div class="party-title">🎉 派對小遊戲（好友一起玩）</div>
 
-  <div class="party-grid3">
-    <button class="btn small secondary" id="btnPartyTruth">💬 真心話</button>
-    <button class="btn small secondary" id="btnPartyDare">🎯 大冒險</button>
-    <button class="btn small" id="btnPartyRandom">🎲 隨機模式</button>
-  </div>
+      <!-- 🎉 派對小遊戲 -->
+      <div class="party-wrap">
+        <div class="party-title">🎉 派對小遊戲（好友一起玩）</div>
 
-  <div class="party-note">不想做就按「下一題」換掉就好 🤍</div>
-</div>
+        <div class="party-grid3">
+          <button class="btn small secondary" id="btnPartyTruth">💬 真心話</button>
+          <button class="btn small secondary" id="btnPartyDare">🎯 大冒險</button>
+          <button class="btn small" id="btnPartyRandom">🎲 隨機模式</button>
+        </div>
+
+        <div class="party-note">不想做就按「下一題」換掉就好 🤍</div>
+      </div>
+
       <!-- ✅ 心情只留 3 種 -->
       <section class="moodWrap">
         <div class="moods" id="moodRow">
@@ -72,14 +81,12 @@
         </div>
         <div class="mood-pill" id="moodPill">未選擇</div>
       </section>
-    </main>
 
-
-
+      <!-- ✅ 只留安裝（你原本多出來的 </nav> 我已移除） -->
       <div class="dock-inner single">
         <button class="btn small" id="btnInstall" style="display:none;">📲 加到主畫面</button>
       </div>
-    </nav>
+    </main>
   </div>
 
   <!-- Loading -->
@@ -90,11 +97,13 @@
         🐻「我在酒窖幫你挑一杯…」<br>
         <span class="load-sub">（小提醒：慢慢喝最幸福）</span>
       </div>
-      <div class="dots" aria-hidden="true"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="dots" aria-hidden="true">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ✅ 酒卡 Modal（分類變少、內容變更完整） -->
+  <!-- 酒卡 Modal -->
   <div class="modal-mask" id="drinkMask">
     <div class="modal">
       <div class="modal-head">
@@ -190,43 +199,46 @@
     </div>
   </div>
 
+  <!-- 派對小遊戲 Modal -->
+  <div class="modal-mask" id="partyMask">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="partyTitle">🎉 派對小遊戲</h3>
+        <button class="xbtn" id="partyClose">關閉 ✕</button>
+      </div>
+
+      <div class="chat-row">
+        <div class="avatar"><img id="partyAvatar" alt="微醺熊"></div>
+        <div style="flex:1">
+          <div class="bubble" id="partyBearLine" title="點我換一句 🐻">🐻「玩輕鬆的就好，不想做就換題！」</div>
+          <div class="bubble-tip">（點熊熊話語可以換一句）</div>
+        </div>
+      </div>
+
+      <div class="party-task">
+        <div class="party-type" id="partyType">—</div>
+        <div class="party-card" id="partyTask">—</div>
+      </div>
+
+      <div class="party-toggle">
+        <label class="toggle">
+          <input type="checkbox" id="partyAlcohol">
+          <span class="toggle-ui"></span>
+          <span class="toggle-text">🍸 酒精模式（更嗨但仍安全）</span>
+        </label>
+      </div>
+
+      <div class="row2" style="margin-top:10px;">
+        <button class="btn small" id="partyNext">🔄 下一題</button>
+        <button class="btn small secondary" id="partyCopy">📋 複製題目</button>
+      </div>
+
+      <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車｜不喝也能玩得很開心</div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">已複製</div>
 
   <script src="app.js"></script>
-  <!-- ✅ Modal：派對小遊戲 -->
-<div class="modal-mask" id="partyMask">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 id="partyTitle">🎉 派對小遊戲</h3>
-      <button class="xbtn" id="partyClose">關閉 ✕</button>
-    </div>
-
-    <div class="chat-row">
-      <div class="avatar"><img id="partyAvatar" alt="微醺熊"></div>
-      <div style="flex:1">
-        <div class="bubble" id="partyBearLine" title="點我換一句 🐻">🐻「玩輕鬆的就好，不想做就換題！」</div>
-        <div class="bubble-tip">（點熊熊話語可以換一句）</div>
-      </div>
-    </div>
-
-    <div class="party-task">
-      <div class="party-type" id="partyType">—</div>
-      <div class="party-card" id="partyTask">—</div>
-    </div>
-<div class="party-toggle">
-  <label class="toggle">
-    <input type="checkbox" id="partyAlcohol">
-    <span class="toggle-ui"></span>
-    <span class="toggle-text">🍸 酒精模式（更嗨但仍安全）</span>
-  </label>
-</div>
-    <div class="row2" style="margin-top:10px;">
-      <button class="btn small" id="partyNext">🔄 下一題</button>
-      <button class="btn small secondary" id="partyCopy">📋 複製題目</button>
-    </div>
-
-    <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車｜不喝也能玩得很開心</div>
-  </div>
-</div>
 </body>
 </html>
