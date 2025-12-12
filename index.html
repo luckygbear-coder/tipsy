@@ -1379,7 +1379,34 @@
         showToast("沒關係～想裝再來找我 🐻");
       }
     });
+<!-- ✅ Modal：主畫面點熊熊 → 純聊天跳窗 -->
+<div class="modal-mask" id="bearChatMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🐻 熊熊陪你一下</h3>
+      <button class="xbtn" id="bearChatClose">關閉 ✕</button>
+    </div>
 
+    <div class="chat-row">
+      <div class="avatar"><img id="bearAvatarChat" alt="微醺熊"></div>
+      <div style="flex:1">
+        <div class="bubble" id="bearChatBubble" title="點我換一句 🐻">🐻「我在這裡。」</div>
+        <div class="bubble-tip">（點一下熊熊話語，可以換一句）</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="chatOnly-note">你可以不喝酒，只聊天也可以。<br>我在這裡陪你。</div>
+    </div>
+
+    <div class="row2" style="margin-top:10px;">
+      <button class="btn small secondary" id="btnCopyChat">📋 複製這句</button>
+      <button class="btn small" id="btnCloseChat2">我知道了</button>
+    </div>
+
+    <div class="smallnote">未滿 18 請勿飲酒｜喝酒不開車</div>
+  </div>
+</div>
     // ========= Service Worker =========
     if("serviceWorker" in navigator){
       window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
