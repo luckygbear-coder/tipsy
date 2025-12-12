@@ -698,6 +698,7 @@ const PARTY_DARE_15 = [
   "選一個人，問他一個你真的好奇的問題。",
   "用一句話幫今天的派對收尾。"
 ];
+
 const PARTY_TRUTH_SPICY_15 = [
   "如果你今天要幫自己取一個『派對暱稱』，會叫什麼？",
   "你最近偷偷喜歡的儀式感是什麼？",
@@ -733,7 +734,8 @@ const PARTY_DARE_SPICY_15 = [
   "幫大家指定下一輪：誰先玩（用溫柔方式）。",
   "做一個『不尷尬』的迷你舞步（3 秒）。"
 ];
-// 熊熊派對開場（輕量跟心情連動；不跟喝酒狀態連動）
+
+// 熊熊派對開場（跟「三種心情」連動）
 const PARTY_BEAR_LINES = {
   base: [
     "🐻「玩輕鬆的就好，不想做就換題！」",
@@ -741,125 +743,144 @@ const PARTY_BEAR_LINES = {
     "🐻「今天的目標：笑一下就賺到了。」"
   ],
   chat: [
-    "🐻「想聊天很棒～慢慢說就好。」",
+    "🐻「想聊聊很棒～慢慢說就好。」",
     "🐻「真心話不用很深，真就好。」"
   ],
   celebrate: [
     "🐻「派對模式開啟！做不到就換題～」",
     "🐻「大冒險也要可愛安全那種喔！」"
   ],
-  sober: [
-    "🐻「清醒也能玩超嗨！不喝也很酷。」",
-    "🐻「安全第一～我們玩氣氛不玩逞強。」"
+  relax: [
+    "🐻「放鬆就好～不需要表現。」",
+    "🐻「我們慢慢來，舒服第一名。」"
   ]
 };
 
-let partyMode = null;     // "truth" | "dare"
+let partyMode = null;         // "truth" | "dare"
 let partyLastIndex = -1;
 let partyAlcoholOn = false;
-const partyAlcohol = document.getElementById("partyAlcohol");
 
-partyAlcohol?.addEventListener("change", ()=>{
-  partyAlcoholOn = !!partyAlcohol.checked;
-  if(typeof showToast === "function"){
-    showToast(partyAlcoholOn ? "酒精模式：派對加辣（仍安全）🍸" : "酒精模式已關閉 🌿");
-  }
-});
+// DOM
 const partyMask = document.getElementById("partyMask");
 const partyTitle = document.getElementById("partyTitle");
 const partyType = document.getElementById("partyType");
 const partyTask = document.getElementById("partyTask");
 const partyBearLine = document.getElementById("partyBearLine");
 const partyAvatar = document.getElementById("partyAvatar");
+const partyAlcohol = document.getElementById("partyAlcohol");
 
 function partyPick(arr){
-  if(arr.length <= 1) return arr[0];
-  let i = Math.floor(Math.random()*arr.length);
+  if(!arr || arr.length === 0) return "（題庫空了）";
+  if(arr.length === 1) return arr[0];
+  let i = Math.floor(Math.random() * arr.length);
   if(i === partyLastIndex) i = (i + 1) % arr.length;
   partyLastIndex = i;
   return arr[i];
+}
+
+function getTruthPool(){
+  return partyAlcoholOn ? PARTY_TRUTH_SPICY_15 : PARTY_TRUTH_15;
+}
+function getDarePool(){
+  return partyAlcoholOn ? PARTY_DARE_SPICY_15 : PARTY_DARE_15;
 }
 
 function partyBearSpeak(){
   const mood = (typeof currentMood !== "undefined") ? currentMood : null;
   const lines = [...PARTY_BEAR_LINES.base];
 
-  if(mood === "想聊天") lines.push(...PARTY_BEAR_LINES.chat);
+  // 你的三種心情：放鬆 / 想聊聊 / 想慶祝
+  if(mood === "想聊聊") lines.push(...PARTY_BEAR_LINES.chat);
   if(mood === "想慶祝") lines.push(...PARTY_BEAR_LINES.celebrate);
-  if(mood === "清醒也好") lines.push(...PARTY_BEAR_LINES.sober);
+  if(mood === "放鬆")   lines.push(...PARTY_BEAR_LINES.relax);
 
   return partyPick(lines);
 }
 
-function openPartyModal(mode){
-  partyTask.textContent = isTruth ? partyPick(getTruthPool()) : partyPick(getDarePool());
-
-  // ✅ 同步熊熊頭像（沿用你原本 IMG_TRY 容錯）
-  if(partyAvatar){
-    partyAvatar.src = (typeof IMG_TRY !== "undefined") ? IMG_TRY[0] : partyAvatar.src;
-    partyAvatar.onerror = ()=> {
-      if(typeof IMG_TRY !== "undefined") partyAvatar.src = IMG_TRY[1];
-    };
+function syncPartyAvatar(){
+  if(!partyAvatar) return;
+  if(typeof IMG_TRY !== "undefined" && IMG_TRY.length){
+    partyAvatar.src = IMG_TRY[0];
+    partyAvatar.onerror = ()=>{ partyAvatar.src = IMG_TRY[1] || IMG_TRY[0]; };
   }
-
-  const isTruth = mode === "truth";
-  function getTruthPool(){
-  return partyAlcoholOn ? PARTY_TRUTH_SPICY_15 : PARTY_TRUTH_15;
 }
-function getDarePool(){
-  return partyAlcoholOn ? PARTY_DARE_SPICY_15 : PARTY_DARE_15;
-}
-  partyBearLine.textContent = partyBearSpeak();
-  partyTask.textContent = isTruth ? partyPick(PARTY_TRUTH_15) : partyPick(PARTY_DARE_15);
 
-  partyMask.classList.add("show");
+function drawPartyTask(){
+  if(!partyTask) return;
+  if(partyMode === "truth") partyTask.textContent = partyPick(getTruthPool());
+  else if(partyMode === "dare") partyTask.textContent = partyPick(getDarePool());
+}
+
+function openPartyModal(mode){
+  partyMode = mode; // ✅ 關鍵：一定要先設定
+  const isTruth = (partyMode === "truth");
+
+  if(partyTitle) partyTitle.textContent = "🎉 派對小遊戲";
+  if(partyType) partyType.textContent  = isTruth ? "💬 真心話" : "🎯 大冒險";
+
+  syncPartyAvatar();
+
+  if(partyBearLine) partyBearLine.textContent = partyBearSpeak();
+  drawPartyTask();
+
+  partyMask?.classList.add("show");
 }
 
 function closePartyModal(){
-  partyMask.classList.remove("show");
+  partyMask?.classList.remove("show");
 }
 
+// 酒精模式開關
+partyAlcohol?.addEventListener("change", ()=>{
+  partyAlcoholOn = !!partyAlcohol.checked;
+  showToast(partyAlcoholOn ? "酒精模式：派對加辣（仍安全）🍸" : "酒精模式已關閉 🌿");
+  // 如果派對視窗開著，就立刻換題（讓你感覺到有變）
+  if(partyMask?.classList.contains("show")) drawPartyTask();
+});
+
+// 按鈕
 document.getElementById("btnPartyTruth")?.addEventListener("click", ()=>openPartyModal("truth"));
 document.getElementById("btnPartyDare")?.addEventListener("click", ()=>openPartyModal("dare"));
-function decideRandomMode(){
-  // 依心情調整比例（不做「喝越多越刺激」這種）
-  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
-  let pTruth = 0.5; // 真心話機率
-  if(mood === "想聊天") pTruth = 0.7;
-  if(mood === "想慶祝") pTruth = 0.3;
-  if(mood === "清醒也好") pTruth = 0.5;
 
+// 隨機模式（依心情偏向）
+function decideRandomMode(){
+  const mood = (typeof currentMood !== "undefined") ? currentMood : null;
+  let pTruth = 0.5;
+  if(mood === "想聊聊") pTruth = 0.7;
+  if(mood === "想慶祝") pTruth = 0.3;
+  if(mood === "放鬆")   pTruth = 0.55;
   return (Math.random() < pTruth) ? "truth" : "dare";
 }
 
 document.getElementById("btnPartyRandom")?.addEventListener("click", ()=>{
   const m = decideRandomMode();
   openPartyModal(m);
-  if(typeof showToast === "function"){
-    showToast(m === "truth" ? "隨機：真心話 💬" : "隨機：大冒險 🎯");
-  }
+  showToast(m === "truth" ? "隨機：真心話 💬" : "隨機：大冒險 🎯");
 });
+
+// 關閉
 document.getElementById("partyClose")?.addEventListener("click", closePartyModal);
 partyMask?.addEventListener("click", (e)=>{ if(e.target === partyMask) closePartyModal(); });
 
+// 下一題
 document.getElementById("partyNext")?.addEventListener("click", ()=>{
   if(!partyMode) return;
-  partyBearLine.textContent = partyBearSpeak();
-partyTask.textContent = partyMode === "truth" ? partyPick(getTruthPool()) : partyPick(getDarePool());
-  if(typeof showToast === "function") showToast("下一題來囉 🎉");
+  if(partyBearLine) partyBearLine.textContent = partyBearSpeak();
+  drawPartyTask();
+  showToast("下一題來囉 🎉");
 });
 
 // 點熊熊話語換一句
 partyBearLine?.addEventListener("click", ()=>{
   partyBearLine.textContent = partyBearSpeak();
-  if(typeof showToast === "function") showToast("熊熊換一句 🐻");
+  showToast("熊熊換一句 🐻");
 });
 
 // 複製題目
 document.getElementById("partyCopy")?.addEventListener("click", ()=>{
-  const t = `${partyTitle.textContent}\n${partyTask.textContent}`.trim();
+  const t = `${partyType?.textContent || "派對題目"}\n${partyTask?.textContent || ""}`.trim();
   navigator.clipboard?.writeText(t);
-  if(typeof showToast === "function") showToast("已複製題目 📋");
+  showToast("已複製題目 📋");
 });
 // ========= 心情（三種） =========
 const moodButtons = Array.from(document.querySelectorAll(".mood-btn"));
