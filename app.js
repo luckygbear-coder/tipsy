@@ -668,10 +668,9 @@ $("btnRandom").addEventListener("click", async ()=>{
   });
 });
 
-$("btnPickList").addEventListener("click", ()=>openListModal("catalog"));
-$("btnHistory").addEventListener("click", ()=>openListModal("history"));
-$("btnFavList").addEventListener("click", ()=>openListModal("fav"));
-
+$("btnIG")?.addEventListener("click", ()=>window.open(IG_URL, "_blank"));
+$("btnHistory")?.addEventListener("click", ()=>openListModal("history"));
+$("btnFavList")?.addEventListener("click", ()=>openListModal("fav"));
 // ==================== 🎉 派對小遊戲：真心話 / 大冒險（各 15 題） ====================
 const PARTY_TRUTH_15 = [
   "最近一次讓你真心開心的是什麼？",
@@ -832,7 +831,7 @@ function openPartyModal(mode){
 
   if(partyBearLine) partyBearLine.textContent = partyBearSpeak();
   drawPartyTask();
-
+if(partyAlcohol) partyAlcohol.checked = partyAlcoholOn;
   partyMask?.classList.add("show");
 }
 
