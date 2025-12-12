@@ -544,3 +544,26 @@ body{
 #partyMask{ z-index:96; }
 #toast{ z-index:97; }
 #loading{ z-index:98; }
+/* ✅ 派對 Modal：iPhone 不卡住、不會超大、內容可捲動 */
+#partyMask{
+  align-items: center;                 /* 原本 flex-end 會把內容擠到底 */
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+}
+
+#partyMask .modal{
+  max-height: 86svh;                   /* iOS 建議用 svh（比 dvh 穩） */
+  border-bottom: 2px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;                    /* 讓標題固定，捲動放在內層 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ 讓派對內容自己捲動（標題不動） */
+#partyMask .party-scroll{
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
+}
