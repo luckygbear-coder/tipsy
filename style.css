@@ -105,30 +105,39 @@ body{
   -webkit-user-drag:none;
 }
 
-/* ✅ 氣泡在熊頭上 */
+/* ✅ 氣泡在熊頭上（縮小版，不遮住熊） */
 .comic-bubble.over-bear{
   position:absolute;
   left:14px;
   right:14px;
-  top:14px;
+  top:12px;
   z-index:5;
 
   background:#fff;
   border:2px solid var(--border);
   border-radius:16px;
-  padding:10px 12px;
-  box-shadow:0 8px 18px rgba(0,0,0,0.18);
+  padding:8px 10px;
+  box-shadow:0 8px 18px rgba(0,0,0,0.16);
 
-  font-size:14px;
-  line-height:1.45;
-  white-space:pre-wrap;
+  font-size:13px;
+  line-height:1.35;
+
+  /* ✅ 讓它變小：最多 3 行 */
+  max-width:78%;
+  white-space:normal;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
 }
 
-/* ✅ 氣泡尾巴：往下指熊 */
+/* 尾巴：指向熊頭（位置微調） */
 .comic-bubble.over-bear::before{
   content:"";
   position:absolute;
-  left:28px;
+  left:22px;
   bottom:-10px;
   width:0;height:0;
   border-left:10px solid transparent;
@@ -138,7 +147,7 @@ body{
 .comic-bubble.over-bear::after{
   content:"";
   position:absolute;
-  left:28px;
+  left:22px;
   bottom:-8px;
   width:0;height:0;
   border-left:9px solid transparent;
