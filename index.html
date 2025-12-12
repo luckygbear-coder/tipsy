@@ -428,6 +428,25 @@
   line-height:1.5;
   text-align:center;
 }
+/* ===== Hero 防誤觸（像 App） ===== */
+.hero, .hero *{
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* iOS 長按不跳出選單 */
+}
+
+.hero img{
+  -webkit-user-drag: none;     /* iOS/Safari 禁止拖曳圖片 */
+  user-drag: none;
+  pointer-events: none;         /* 點擊穿透到 .hero（避免點到圖片本身） */
+}
+
+/* 點擊回饋更像按鈕 */
+.hero:active{
+  transform: translateY(1px) scale(.995);
+  filter: brightness(.99);
+  transition: transform .08s ease, filter .15s ease;
+}
   </style>
 </head>
 
@@ -617,7 +636,18 @@
       const hero = document.getElementById("bearHeroImg");
       hero.onerror = () => { idx = Math.min(idx+1, IMG_TRY.length-1); apply(); };
     }
+// ===== Hero 防誤觸（避免拖曳/長按選取）=====
+(function lockHeroTouch(){
+  const hero = document.getElementById("heroTap");
+  if(!hero) return;
 
+  // 阻止長按選字 / 拖曳
+  hero.addEventListener("dragstart", (e)=>e.preventDefault());
+  hero.addEventListener("contextmenu", (e)=>e.preventDefault());
+
+  // iOS 長按可能觸發 selection / callout，這裡更保險
+  hero.addEventListener("touchstart", ()=>{}, {passive:true});
+})();
     // ========= 基本 =========
     const IG_URL = "https://instagram.com/luckygbear";
     const KEY_HISTORY = "tipsyBear_history_v5";
