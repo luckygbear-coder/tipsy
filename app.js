@@ -803,9 +803,12 @@ function openPartyModal(mode){
   }
 
   const isTruth = mode === "truth";
-  partyTitle.textContent = isTruth ? "💬 真心話" : "🎯 大冒險";
-  partyType.textContent = isTruth ? "💬 真心話｜抽一題" : "🎯 大冒險｜抽一題";
-
+  function getTruthPool(){
+  return partyAlcoholOn ? PARTY_TRUTH_SPICY_15 : PARTY_TRUTH_15;
+}
+function getDarePool(){
+  return partyAlcoholOn ? PARTY_DARE_SPICY_15 : PARTY_DARE_15;
+}
   partyBearLine.textContent = partyBearSpeak();
   partyTask.textContent = isTruth ? partyPick(PARTY_TRUTH_15) : partyPick(PARTY_DARE_15);
 
