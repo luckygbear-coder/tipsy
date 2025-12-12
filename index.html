@@ -409,25 +409,7 @@
       outline:none;
       background:#fff;
     }
-    /* ===== 主畫面點熊熊：純聊天跳窗（不影響酒功能） ===== */
-.hero{ cursor:pointer; user-select:none; }
 
-.tapHint{
-  position:absolute; right:10px; top:10px;
-  background:rgba(255,247,230,.92);
-  border:2px dashed var(--border);
-  padding:8px 10px; border-radius:999px;
-  font-size:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-}
-
-.chatOnly-note{
-  margin-top:10px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-  text-align:center;
-}
   </style>
 </head>
 
@@ -1489,5 +1471,24 @@ if(btnCopyChat) btnCopyChat.addEventListener("click", ()=>{
       window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
     }
   </script>
+      /* ===== 主畫面點熊熊：純聊天跳窗（不影響酒功能） ===== */
+.hero{ cursor:pointer; user-select:none; }
+
+.tapHint{
+  position:absolute; right:10px; top:10px;
+  background:rgba(255,247,230,.92);
+  border:2px dashed var(--border);
+  padding:8px 10px; border-radius:999px;
+  font-size:12px;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+}
+
+.chatOnly-note{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
+}
 </body>
 </html>
