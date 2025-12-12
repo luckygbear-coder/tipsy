@@ -341,7 +341,7 @@ function refreshComicBubble(){
   // ✅ 控制長度，避免把熊遮住
   b.textContent = clampText(t, 42);
 }
-}
+
 
 function getPool(){
   if(!currentMood) return DRINKS;
@@ -653,7 +653,6 @@ $("btnClearHistory").addEventListener("click", ()=>{ localStorage.removeItem(KEY
 $("btnClearFav").addEventListener("click", ()=>{ localStorage.removeItem(KEY_FAV); renderList(); if(currentDrink) setFavButton(); showToast("已清空收藏"); });
 
 // ========= 主畫面按鈕 =========
-$("btnIG").addEventListener("click", ()=>window.open(IG_URL, "_blank"));
 document.getElementById("btnIGTop")?.addEventListener("click", (e)=>{
   // 讓 a 連結本身就能開 IG（這裡不阻止預設）
 });
@@ -954,8 +953,8 @@ installBtn.addEventListener("click", async ()=>{
 // ========= 初始化 =========
 setBearImages();
 $("todayLine").textContent = pick(TODAY_LINES);
-$("countBadge").textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;
-bindHeroComic();
+const cb = $("countBadge");
+if(cb) cb.textContent = `🍇 微醺酒窖｜已收錄 ${DRINKS.length} 杯`;bindHeroComic();
 refreshComicBubble();
 
 // ========= Service Worker =========
