@@ -440,6 +440,75 @@ body{
   background:#fff;
   animation:bob 1.1s ease-in-out infinite;
 }
+/* =========================
+   ✅ 修正：派對小遊戲 Modal 太大 & 看不到內容
+   只影響 #partyMask
+   ========================= */
+
+/* 1) 派對視窗不要貼底，改置中 + 可滾動 */
+#partyMask.modal-mask{
+  align-items: center;     /* 覆蓋原本 flex-end */
+  justify-content: center;
+  padding: 14px;
+}
+
+/* 2) 派對 modal 限高、整個 modal 可捲動（因為派對內容不在 .content） */
+#partyMask .modal{
+  width: min(520px, 100%);
+  max-height: 92dvh;
+  overflow: auto;          /* ✅ 關鍵：派對內容直接讓 modal 捲動 */
+  -webkit-overflow-scrolling: touch;
+
+  border-radius: 18px;     /* 置中時比較好看 */
+  border-bottom: 2px solid var(--border); /* 因為不貼底了 */
+}
+
+/* 3) 補齊派對內部排版，避免元素撐爆 */
+#partyMask .chat-row{
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+#partyMask .avatar{
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  overflow: hidden;
+  background: #fff;
+  flex: 0 0 auto;
+}
+
+#partyMask .avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#partyMask .bubble{
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.10);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#partyMask .bubble-tip{
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 4) 題目卡不要太高（保險） */
+#partyMask .party-card{
+  max-height: 40dvh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .load-bear img{width:100%;height:100%;object-fit:cover}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .dots{display:flex; gap:6px; justify-content:center; margin-top:10px;}
